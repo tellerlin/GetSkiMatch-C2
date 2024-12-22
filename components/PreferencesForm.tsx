@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -14,8 +14,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import type { UserPreferences, TerrainPreference, SkillLevel } from '@/lib/types';
+
+const terrainOptions: { value: TerrainPreference; label: string }[] = [
+  { value: 'groomed', label: 'Groomed Runs' },
+  { value: 'powder', label: 'Powder Snow' },
+  { value: 'park', label: 'Terrain Park' },
+  { value: 'backcountry', label: 'Backcountry' },
+];
 
 export default function PreferencesForm() {
   const router = useRouter();
@@ -28,13 +34,6 @@ export default function PreferencesForm() {
     });
     router.push(`/recommendations?${queryParams.toString()}`);
   };
-
-  const terrainOptions: { value: TerrainPreference; label: string }[] = [
-    { value: 'groomed', label: 'Groomed Runs' },
-    { value: 'powder', label: 'Powder Snow' },
-    { value: 'park', label: 'Terrain Park' },
-    { value: 'backcountry', label: 'Backcountry' },
-  ];
 
   const handleTerrainChange = (terrain: TerrainPreference) => {
     setSelectedTerrain(prev => {
@@ -91,6 +90,7 @@ export default function PreferencesForm() {
             onValueChange={([min, max]) => {
               setValue('budgetRange', { min, max });
             }}
+            className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-black [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
           />
           <div className="mt-2 flex justify-between text-sm text-gray-500">
             <span>$0</span>
@@ -109,6 +109,7 @@ export default function PreferencesForm() {
           onValueChange={([value]) => {
             setValue('travelDistance', value);
           }}
+          className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-black [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
         />
         <div className="mt-2 flex justify-between text-sm text-gray-500">
           <span>0 km</span>

@@ -1,42 +1,72 @@
 {
   "whistler-blackcomb": {
+    "lat": 50.1163,
+    "lon": -122.9574,
+    "timezone": "America/Vancouver",
     "current": {
+      "dt": 1684929490,
       "temp": -2.4,
       "feels_like": -5.8,
       "humidity": 86,
       "wind_speed": 3.6,
       "weather": [
         {
+          "main": "Snow",
           "description": "Light snow",
           "icon": "13d"
         }
       ]
     },
+    "minutely": [
+      {
+        "dt": 1684929540,
+        "precipitation": 0.5
+      }
+    ],
+    "hourly": [
+      {
+        "dt": 1684926000,
+        "temp": -2.1,
+        "feels_like": -5.3,
+        "humidity": 85,
+        "wind_speed": 3.2,
+        "weather": [{"main": "Snow", "description": "Light snow"}],
+        "pop": 0.9,
+        "snow": {"1h": 1.2}
+      }
+    ],
     "daily": [
       {
+        "dt": 1684908000,
         "temp": {
           "min": -4.2,
-          "max": -1.1
+          "max": -1.1,
+          "day": -2.5,
+          "night": -3.8
         },
+        "feels_like": {
+          "day": -5.8,
+          "night": -7.2
+        },
+        "humidity": 88,
+        "wind_speed": 3.6,
+        "weather": [{"main": "Snow", "description": "Light snow"}],
         "pop": 0.8,
         "snow": 12.5
-      },
-      {
-        "temp": {
-          "min": -3.8,
-          "max": -0.5
-        },
-        "pop": 0.6,
-        "snow": 8.2
-      },
-      {
-        "temp": {
-          "min": -5.1,
-          "max": -2.3
-        },
-        "pop": 0.7,
-        "snow": 15.3
       }
-    ]
+    ],
+    "alerts": [
+      {
+        "sender_name": "Environment Canada",
+        "event": "Snow Warning",
+        "start": 1684926000,
+        "end": 1685012400,
+        "description": "Heavy snowfall expected. Total accumulations of 20-30cm possible."
+      }
+    ],
+    "summary": {
+      "ai_generated": "Perfect powder conditions expected with consistent snowfall throughout the week. Excellent visibility in the mornings, with some afternoon clouds. Ideal for all skill levels, particularly powder enthusiasts.",
+      "weekly_overview": "Consistent snowfall with accumulation of 50-60cm expected over the week. Temperatures remaining below freezing, ensuring excellent snow conditions."
+    }
   }
 }
