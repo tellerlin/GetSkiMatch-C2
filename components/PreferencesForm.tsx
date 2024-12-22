@@ -90,7 +90,7 @@ export default function PreferencesForm() {
             onValueChange={([min, max]) => {
               setValue('budgetRange', { min, max });
             }}
-            className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-black [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
+            thumbClassName="h-4 w-4 bg-black border-2 border-white rounded-full"
           />
           <div className="mt-2 flex justify-between text-sm text-gray-500">
             <span>$0</span>
@@ -109,7 +109,7 @@ export default function PreferencesForm() {
           onValueChange={([value]) => {
             setValue('travelDistance', value);
           }}
-          className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-black [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
+          thumbClassName="h-4 w-4 bg-black border-2 border-white rounded-full"
         />
         <div className="mt-2 flex justify-between text-sm text-gray-500">
           <span>0 km</span>
