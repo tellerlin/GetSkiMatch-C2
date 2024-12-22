@@ -25,8 +25,18 @@ const terrainOptions: { value: TerrainPreference; label: string }[] = [
 
 export default function PreferencesForm() {
   const router = useRouter();
-  const { register, handleSubmit, setValue, watch } = useForm<UserPreferences>();
-  const [selectedTerrain, setSelectedTerrain] = useState<TerrainPreference[]>([]);
+  const allTerrains = terrainOptions.map(option => option.value);
+  
+  const { register, handleSubmit, setValue, watch } = useForm<UserPreferences>({
+    defaultValues: {
+      skillLevel: 'beginner',
+      budgetRange: { min: 0, max: 500 },
+      travelDistance: 1000,
+      terrainPreferences: allTerrains,
+    },
+  });
+  
+  const [selectedTerrain, setSelectedTerrain] = useState<TerrainPreference[]>(allTerrains);
 
   const onSubmit = (data: UserPreferences) => {
     const queryParams = new URLSearchParams({
@@ -51,6 +61,7 @@ export default function PreferencesForm() {
         <Label>Skill Level</Label>
         <Select
           onValueChange={(value: SkillLevel) => setValue('skillLevel', value)}
+          defaultValue="beginner"
         >
           <SelectTrigger>
             <SelectValue placeholder="Select your skill level" />
@@ -83,7 +94,7 @@ export default function PreferencesForm() {
         <Label>Budget Range (USD)</Label>
         <div className="pt-6">
           <Slider
-            defaultValue={[50, 200]}
+            defaultValue={[0, 500]}
             min={0}
             max={500}
             step={10}
@@ -102,12 +113,12 @@ export default function PreferencesForm() {
       <div className="space-y-4">
         <Label>Maximum Travel Distance (km)</Label>
         <Slider
-          defaultValue={[100]}
+          defaultValue={[0, 1000]}
           min={0}
           max={1000}
           step={50}
-          onValueChange={([value]) => {
-            setValue('travelDistance', value);
+          onValueChange={([min, max]) => {
+            setValue('travelDistance', max);
           }}
           thumbClassName="h-4 w-4 bg-black border-2 border-white rounded-full"
         />
