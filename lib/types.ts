@@ -41,7 +41,7 @@ export interface UserPreferences {
     min: number;
     max: number;
   };
-  travelDistance: number; // in kilometers
+  country: string;
 }
 
 export interface WeatherData {

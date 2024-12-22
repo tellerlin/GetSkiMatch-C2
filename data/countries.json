@@ -1,0 +1,59 @@
+{
+  "countries": [
+    {
+      "name": "Australia",
+      "agency": "Australian Bureau of Meteorology",
+      "resortCount": 12
+    },
+    {
+      "name": "Austria",
+      "agency": "Central Institute for Meteorology and Geodynamics",
+      "resortCount": 45
+    },
+    {
+      "name": "Canada",
+      "agency": "Meteorological Service of Canada",
+      "resortCount": 38
+    },
+    {
+      "name": "France",
+      "agency": "Meteo-France",
+      "resortCount": 52
+    },
+    {
+      "name": "Germany",
+      "agency": "German Meteorological Office",
+      "resortCount": 23
+    },
+    {
+      "name": "Italy",
+      "agency": "Italian Air Force National Meteorological Service",
+      "resortCount": 34
+    },
+    {
+      "name": "Japan",
+      "agency": "Japan Meteorological Agency",
+      "resortCount": 42
+    },
+    {
+      "name": "New Zealand",
+      "agency": "Meteorological Service of New Zealand Limited",
+      "resortCount": 15
+    },
+    {
+      "name": "Norway",
+      "agency": "Norwegian Meteorological Institute",
+      "resortCount": 28
+    },
+    {
+      "name": "Switzerland",
+      "agency": "MeteoSwiss",
+      "resortCount": 56
+    },
+    {
+      "name": "United States",
+      "agency": "National Oceanic and Atmospheric Administration (NOAA), National Weather Service",
+      "resortCount": 65
+    }
+  ]
+}

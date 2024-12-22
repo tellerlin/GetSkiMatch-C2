@@ -15,20 +15,15 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import { Snowflake, Sun, CloudRain } from 'lucide-react';
+import { Snowflake, Sun, Globe2 } from 'lucide-react';
 import type { UserPreferences, TerrainPreference, SkillLevel } from '@/lib/types';
+import countries from '@/data/countries.json';
 
 const terrainOptions: { value: TerrainPreference; label: string }[] = [
   { value: 'groomed', label: 'Groomed Runs' },
   { value: 'powder', label: 'Powder Snow' },
   { value: 'park', label: 'Terrain Park' },
   { value: 'backcountry', label: 'Backcountry' },
-];
-
-const weatherPreferences = [
-  { id: 'snow', label: 'Snowy', icon: Snowflake },
-  { id: 'sun', label: 'Sunny', icon: Sun },
-  { id: 'any', label: 'Any Weather', icon: CloudRain },
 ];
 
 export default function PreferencesForm() {
@@ -39,14 +34,13 @@ export default function PreferencesForm() {
     defaultValues: {
       skillLevel: 'beginner',
       budgetRange: { min: 0, max: 500 },
-      travelDistance: 1000,
+      country: '',
       terrainPreferences: allTerrains,
-      weatherPreference: 'any',
     },
   });
   
   const [selectedTerrain, setSelectedTerrain] = useState<TerrainPreference[]>(allTerrains);
-  const [selectedWeather, setSelectedWeather] = useState('any');
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
 
   const onSubmit = (data: UserPreferences) => {
     const queryParams = new URLSearchParams({
@@ -65,9 +59,9 @@ export default function PreferencesForm() {
     });
   };
 
-  const handleWeatherChange = (weather: string) => {
-    setSelectedWeather(weather);
-    setValue('weatherPreference', weather);
+  const handleCountryChange = (country: string) => {
+    setSelectedCountry(country);
+    setValue('country', country);
   };
 
   return (
@@ -90,25 +84,38 @@ export default function PreferencesForm() {
       </div>
 
       <div className="space-y-4">
-        <Label>Weather Preference</Label>
-        <div className="grid grid-cols-3 gap-4">
-          {weatherPreferences.map(({ id, label, icon: Icon }) => (
-            <Card
-              key={id}
-              className={`p-4 cursor-pointer transition-colors ${
-                selectedWeather === id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'hover:border-gray-300'
-              }`}
-              onClick={() => handleWeatherChange(id)}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <Icon className="h-6 w-6 text-blue-600" />
-                <span className="text-sm font-medium">{label}</span>
+        <Label>Country</Label>
+        <Select
+          onValueChange={handleCountryChange}
+          value={selectedCountry}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a country" />
+          </SelectTrigger>
+          <SelectContent>
+            {countries.countries.map((country) => (
+              <SelectItem key={country.name} value={country.name}>
+                <div className="flex items-center justify-between w-full">
+                  <span>{country.name}</span>
+                  <span className="ml-8 text-sm text-gray-500">
+                    {country.resortCount} resorts
+                  </span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {selectedCountry && (
+          <div className="mt-2 p-3 bg-blue-50 rounded-md">
+            <div className="flex items-center gap-2">
+              <Globe2 className="h-5 w-5 text-blue-600" />
+              <div className="text-sm">
+                Selected: <span className="font-medium">{selectedCountry}</span>
               </div>
-            </Card>
-          ))}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -128,7 +135,7 @@ export default function PreferencesForm() {
       </div>
 
       <div className="space-y-4">
-        <Label>Budget Range (USD)</Label>
+        <Label>Day Pass Budget Range (USD)</Label>
         <div className="pt-6">
           <Slider
             defaultValue={[0, 500]}
@@ -143,23 +150,6 @@ export default function PreferencesForm() {
             <span>$0</span>
             <span>$500</span>
           </div>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <Label>Maximum Travel Distance (km)</Label>
-        <Slider
-          defaultValue={[1000]}
-          min={0}
-          max={1000}
-          step={50}
-          onValueChange={([value]) => {
-            setValue('travelDistance', value);
-          }}
-        />
-        <div className="mt-2 flex justify-between text-sm text-gray-500">
-          <span>0 km</span>
-          <span>1000 km</span>
         </div>
       </div>
 

@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Snowflake, Mountain, DollarSign } from 'lucide-react';
-import WeatherBadge from './weather/WeatherBadge';
+import { Snowflake, Mountain, DollarSign, Wind, Thermometer } from 'lucide-react';
 import type { SkiResort } from '@/lib/types';
 
 interface ResortCardProps {
@@ -27,11 +26,22 @@ export default function ResortCard({ resort, weather }: ResortCardProps) {
             {resort.matchScore}% Match
           </Badge>
           {weather && (
-            <WeatherBadge
-              temp={weather.current.temp}
-              conditions={weather.current.weather[0].main}
-              className="bg-white/90"
-            />
+            <div className="flex flex-col gap-1">
+              <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
+                <Thermometer className="h-3 w-3" />
+                {weather.current.temp}°C
+              </Badge>
+              <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
+                <Wind className="h-3 w-3" />
+                {weather.current.wind_speed} m/s
+              </Badge>
+              {weather.current.weather[0].main.toLowerCase().includes('snow') && (
+                <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
+                  <Snowflake className="h-3 w-3" />
+                  Snowing
+                </Badge>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -71,15 +81,6 @@ export default function ResortCard({ resort, weather }: ResortCardProps) {
               Day Pass: ${resort.pricing.adultDayPass}
             </span>
           </div>
-
-          {weather && weather.alerts && weather.alerts.length > 0 && (
-            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-              <p className="font-medium text-yellow-800">Weather Alert:</p>
-              <p className="text-yellow-700 truncate">
-                {weather.alerts[0].event}
-              </p>
-            </div>
-          )}
         </div>
         
         <Link
