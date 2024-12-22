@@ -1,0 +1,42 @@
+{
+  "whistler-blackcomb": {
+    "current": {
+      "temp": -2.4,
+      "feels_like": -5.8,
+      "humidity": 86,
+      "wind_speed": 3.6,
+      "weather": [
+        {
+          "description": "Light snow",
+          "icon": "13d"
+        }
+      ]
+    },
+    "daily": [
+      {
+        "temp": {
+          "min": -4.2,
+          "max": -1.1
+        },
+        "pop": 0.8,
+        "snow": 12.5
+      },
+      {
+        "temp": {
+          "min": -3.8,
+          "max": -0.5
+        },
+        "pop": 0.6,
+        "snow": 8.2
+      },
+      {
+        "temp": {
+          "min": -5.1,
+          "max": -2.3
+        },
+        "pop": 0.7,
+        "snow": 15.3
+      }
+    ]
+  }
+}
