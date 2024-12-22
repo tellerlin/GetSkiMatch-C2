@@ -31,10 +31,12 @@ export interface SkiResort {
 
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced';
 export type TerrainPreference = 'groomed' | 'powder' | 'park' | 'backcountry';
+export type WeatherPreference = 'snow' | 'sun' | 'any';
 
 export interface UserPreferences {
   skillLevel: SkillLevel;
   terrainPreferences: TerrainPreference[];
+  weatherPreference: WeatherPreference;
   budgetRange: {
     min: number;
     max: number;
@@ -49,6 +51,7 @@ export interface WeatherData {
     humidity: number;
     wind_speed: number;
     weather: Array<{
+      main: string;
       description: string;
       icon: string;
     }>;
@@ -60,5 +63,11 @@ export interface WeatherData {
     };
     pop: number;
     snow?: number;
+  }>;
+  alerts?: Array<{
+    event: string;
+    description: string;
+    start: number;
+    end: number;
   }>;
 }

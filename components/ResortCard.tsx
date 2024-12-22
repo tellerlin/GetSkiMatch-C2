@@ -4,13 +4,15 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Snowflake, Mountain, DollarSign } from 'lucide-react';
+import WeatherBadge from './weather/WeatherBadge';
 import type { SkiResort } from '@/lib/types';
 
 interface ResortCardProps {
   resort: SkiResort & { matchScore: number };
+  weather?: any;
 }
 
-export default function ResortCard({ resort }: ResortCardProps) {
+export default function ResortCard({ resort, weather }: ResortCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative h-48">
@@ -20,10 +22,17 @@ export default function ResortCard({ resort }: ResortCardProps) {
           fill
           className="object-cover"
         />
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex flex-col gap-2">
           <Badge variant="secondary" className="bg-white/90 text-blue-600">
             {resort.matchScore}% Match
           </Badge>
+          {weather && (
+            <WeatherBadge
+              temp={weather.current.temp}
+              conditions={weather.current.weather[0].main}
+              className="bg-white/90"
+            />
+          )}
         </div>
       </div>
       
@@ -62,6 +71,15 @@ export default function ResortCard({ resort }: ResortCardProps) {
               Day Pass: ${resort.pricing.adultDayPass}
             </span>
           </div>
+
+          {weather && weather.alerts && weather.alerts.length > 0 && (
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+              <p className="font-medium text-yellow-800">Weather Alert:</p>
+              <p className="text-yellow-700 truncate">
+                {weather.alerts[0].event}
+              </p>
+            </div>
+          )}
         </div>
         
         <Link
