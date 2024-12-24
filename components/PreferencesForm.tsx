@@ -1,7 +1,7 @@
 'use client';
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -14,22 +14,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Globe2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import type { ResortFilters } from '@/lib/types/filters';
+import type { Country } from '@/lib/types/filters';
 
 
 export default function PreferencesForm() {
   const router = useRouter();
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [countries, setCountries] = useState<Country[]>([]);
   
+  useEffect(() => {
+    // 获取国家列表
+    fetch('https://ski-query-worker.3we.org/countries')
+      .then(response => response.json())
+      .then(data => setCountries(data))
+      .catch(error => console.error('Error fetching countries:', error));
+  }, []);
+
+
   const { register, handleSubmit, setValue, watch } = useForm<ResortFilters>({
     defaultValues: {
       total_slopes_min: 0,
       total_slopes_max: 500,
+      snow_parks_min: 0,
+      snow_parks_max: 100,
+      ski_lifts_min: 0,
+      ski_lifts_max: 50,
       adult_day_pass_min: 0,
       adult_day_pass_max: 500,
-      beginner_percentage_min: 0,
-      advanced_percentage_min: 0,
     },
   });
 
@@ -47,6 +59,7 @@ export default function PreferencesForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {/* Resort Name */}
       <div className="space-y-4">
         <Label>Resort Name</Label>
         <div className="relative">
@@ -60,6 +73,30 @@ export default function PreferencesForm() {
       </div>
 
 
+      {/* Countries */}
+      <div className="space-y-4">
+        <Label>Countries</Label>
+        <Select 
+          onValueChange={(value) => setValue('country_code', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Country" />
+          </SelectTrigger>
+          <SelectContent>
+            {countries.map((country) => (
+              <SelectItem 
+                key={country.country_code} 
+                value={country.country_code}
+              >
+                {country.name} ({country.total_resorts} resorts)
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+
+      {/* Total Slopes Range */}
       <div className="space-y-4">
         <Label>Total Slopes Range</Label>
         <div className="grid grid-cols-2 gap-4">
@@ -77,8 +114,45 @@ export default function PreferencesForm() {
       </div>
 
 
+      {/* Snow Parks Range */}
       <div className="space-y-4">
-        <Label>Day Pass Budget Range</Label>
+        <Label>Snow Parks Range</Label>
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            type="number"
+            placeholder="Min snow parks"
+            {...register('snow_parks_min', { valueAsNumber: true })}
+          />
+          <Input
+            type="number"
+            placeholder="Max snow parks"
+            {...register('snow_parks_max', { valueAsNumber: true })}
+          />
+        </div>
+      </div>
+
+
+      {/* Ski Lifts Range */}
+      <div className="space-y-4">
+        <Label>Ski Lifts Range</Label>
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            type="number"
+            placeholder="Min ski lifts"
+            {...register('ski_lifts_min', { valueAsNumber: true })}
+          />
+          <Input
+            type="number"
+            placeholder="Max ski lifts"
+            {...register('ski_lifts_max', { valueAsNumber: true })}
+          />
+        </div>
+      </div>
+
+
+      {/* Adult Day Pass Range */}
+      <div className="space-y-4">
+        <Label>Adult Day Pass Range</Label>
         <div className="grid grid-cols-2 gap-4">
           <Input
             type="number"
@@ -94,57 +168,20 @@ export default function PreferencesForm() {
       </div>
 
 
-      <div className="space-y-4">
-        <Label>Beginner Slopes Percentage</Label>
-        <Input
-          type="number"
-          placeholder="Minimum beginner slopes percentage"
-          {...register('beginner_percentage_min', { valueAsNumber: true })}
-        />
-      </div>
-
-
-      <div className="space-y-4">
-        <Label>Advanced Slopes Percentage</Label>
-        <Input
-          type="number"
-          placeholder="Minimum advanced slopes percentage"
-          {...register('advanced_percentage_min', { valueAsNumber: true })}
-        />
-      </div>
-
-
+      {/* Night Skiing */}
       <div className="space-y-4">
         <Label>Night Skiing</Label>
         <Select 
-          onValueChange={(value) => setValue('night_skiing', value === 'true')}
+          onValueChange={(value) => setValue('night_skiing', value === '1' ? 1 : 0)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select Night Skiing" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="true">Available</SelectItem>
-            <SelectItem value="false">Not Available</SelectItem>
+            <SelectItem value="1">Available</SelectItem>
+            <SelectItem value="0">Not Available</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-
-
-      <div className="space-y-4">
-        <Label>Region</Label>
-        <Input
-          placeholder="Enter region"
-          {...register('region')}
-        />
-      </div>
-
-
-      <div className="space-y-4">
-        <Label>Country</Label>
-        <Input
-          placeholder="Enter country code"
-          {...register('country_code')}
-        />
       </div>
 
 

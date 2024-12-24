@@ -6,7 +6,7 @@ import { SkiResort, UserPreferences } from '@/lib/types';
 import { calculateMatchScore } from '@/lib/utils/recommendations';
 import { getRecommendations } from '@/lib/utils/resort-service';
 import { getWeatherData } from '@/lib/utils/weather-service';
-import ResortCard from '@/components/ResortCard';
+import ResortCard from '@/components/resort/ResortCard';
 import { Loader2, CloudSnow, Thermometer } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
