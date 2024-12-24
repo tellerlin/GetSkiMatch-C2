@@ -1,9 +1,9 @@
 'use client';
 
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -14,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
 import { Search, Globe2 } from 'lucide-react';
 import type { ResortFilters } from '@/lib/types/filters';
+
 
 export default function PreferencesForm() {
   const router = useRouter();
@@ -28,8 +28,11 @@ export default function PreferencesForm() {
       total_slopes_max: 500,
       adult_day_pass_min: 0,
       adult_day_pass_max: 500,
+      beginner_percentage_min: 0,
+      advanced_percentage_min: 0,
     },
   });
+
 
   const onSubmit = (data: ResortFilters) => {
     const queryParams = new URLSearchParams();
@@ -40,6 +43,7 @@ export default function PreferencesForm() {
     });
     router.push(`/resorts?${queryParams.toString()}`);
   };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -54,6 +58,7 @@ export default function PreferencesForm() {
           />
         </div>
       </div>
+
 
       <div className="space-y-4">
         <Label>Total Slopes Range</Label>
@@ -71,6 +76,7 @@ export default function PreferencesForm() {
         </div>
       </div>
 
+
       <div className="space-y-4">
         <Label>Day Pass Budget Range</Label>
         <div className="grid grid-cols-2 gap-4">
@@ -86,6 +92,61 @@ export default function PreferencesForm() {
           />
         </div>
       </div>
+
+
+      <div className="space-y-4">
+        <Label>Beginner Slopes Percentage</Label>
+        <Input
+          type="number"
+          placeholder="Minimum beginner slopes percentage"
+          {...register('beginner_percentage_min', { valueAsNumber: true })}
+        />
+      </div>
+
+
+      <div className="space-y-4">
+        <Label>Advanced Slopes Percentage</Label>
+        <Input
+          type="number"
+          placeholder="Minimum advanced slopes percentage"
+          {...register('advanced_percentage_min', { valueAsNumber: true })}
+        />
+      </div>
+
+
+      <div className="space-y-4">
+        <Label>Night Skiing</Label>
+        <Select 
+          onValueChange={(value) => setValue('night_skiing', value === 'true')}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Night Skiing" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Available</SelectItem>
+            <SelectItem value="false">Not Available</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+
+      <div className="space-y-4">
+        <Label>Region</Label>
+        <Input
+          placeholder="Enter region"
+          {...register('region')}
+        />
+      </div>
+
+
+      <div className="space-y-4">
+        <Label>Country</Label>
+        <Input
+          placeholder="Enter country code"
+          {...register('country_code')}
+        />
+      </div>
+
 
       <Button type="submit" className="w-full">
         Find Resorts
