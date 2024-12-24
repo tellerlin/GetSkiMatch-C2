@@ -1,12 +1,11 @@
 'use client';
 
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -14,176 +13,128 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
-import type { ResortFilters } from '@/lib/types/filters';
-import type { Country } from '@/lib/types/filters';
-
+import { Search, Snowflake, Mountain, Moon } from 'lucide-react';
 
 export default function PreferencesForm() {
   const router = useRouter();
-  const [countries, setCountries] = useState<Country[]>([]);
-  
-  useEffect(() => {
-    // 获取国家列表
-    fetch('https://ski-query-worker.3we.org/countries')
-      .then(response => response.json())
-      .then(data => setCountries(data))
-      .catch(error => console.error('Error fetching countries:', error));
-  }, []);
-
-
-  const { register, handleSubmit, setValue, watch } = useForm<ResortFilters>({
-    defaultValues: {
-      total_slopes_min: 0,
-      total_slopes_max: 500,
-      snow_parks_min: 0,
-      snow_parks_max: 100,
-      ski_lifts_min: 0,
-      ski_lifts_max: 50,
-      adult_day_pass_min: 0,
-      adult_day_pass_max: 500,
-    },
+  const [filters, setFilters] = useState({
+    name: '',
+    country_code: '',
+    total_slopes_min: 0,
+    total_slopes_max: 200,
+    adult_day_pass_min: 0,
+    adult_day_pass_max: 500,
+    night_skiing: undefined as undefined | number
   });
-
-
-  const onSubmit = (data: ResortFilters) => {
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // 只包含有值的筛选条件
     const queryParams = new URLSearchParams();
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== '' && value !== 0) {
         queryParams.append(key, value.toString());
       }
     });
+    
     router.push(`/resorts?${queryParams.toString()}`);
   };
 
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Resort Name */}
-      <div className="space-y-4">
-        <Label>Resort Name</Label>
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Search resorts..."
-            className="pl-9"
-            {...register('name')}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 搜索框 */}
+        <div className="md:col-span-2">
+          <Label>Resort Name</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            <Input 
+              placeholder="Search resorts..." 
+              className="pl-9"
+              value={filters.name}
+              onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+            />
+          </div>
+        </div>
+
+        {/* 国家选择 */}
+        <div>
+          <Label>Country</Label>
+          <Select onValueChange={(value) => setFilters(prev => ({ ...prev, country_code: value }))}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="US">United States</SelectItem>
+              <SelectItem value="CA">Canada</SelectItem>
+              <SelectItem value="FR">France</SelectItem>
+              <SelectItem value="CH">Switzerland</SelectItem>
+              <SelectItem value="IT">Italy</SelectItem>
+              <SelectItem value="AT">Austria</SelectItem>
+              <SelectItem value="JP">Japan</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+
+        {/* 夜间滑雪选项 */}
+        <div>
+          <Label>Night Skiing</Label>
+          <Select onValueChange={(value) => setFilters(prev => ({ 
+            ...prev, 
+            night_skiing: value === 'any' ? undefined : Number(value) 
+          }))}>
+            <SelectTrigger>
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+              <SelectItem value="1">Available</SelectItem>
+              <SelectItem value="0">Not Available</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+
+        {/* 雪道数量范围滑块 */}
+        <div className="md:col-span-2">
+          <Label className="mb-6">
+            Number of Slopes ({filters.total_slopes_min} - {filters.total_slopes_max})
+          </Label>
+          <Slider
+            min={0}
+            max={200}
+            step={5}
+            value={[filters.total_slopes_min, filters.total_slopes_max]}
+            onValueChange={([min, max]) => setFilters(prev => ({
+              ...prev,
+              total_slopes_min: min,
+              total_slopes_max: max
+            }))}
+            className="mt-2"
+          />
+        </div>
+
+        {/* 价格范围滑块 */}
+        <div className="md:col-span-2">
+          <Label className="mb-6">
+            Price Range (${filters.adult_day_pass_min} - ${filters.adult_day_pass_max})
+          </Label>
+          <Slider
+            min={0}
+            max={500}
+            step={10}
+            value={[filters.adult_day_pass_min, filters.adult_day_pass_max]}
+            onValueChange={([min, max]) => setFilters(prev => ({
+              ...prev,
+              adult_day_pass_min: min,
+              adult_day_pass_max: max
+            }))}
+            className="mt-2"
           />
         </div>
       </div>
-
-
-      {/* Countries */}
-      <div className="space-y-4">
-        <Label>Countries</Label>
-        <Select 
-          onValueChange={(value) => setValue('country_code', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Country" />
-          </SelectTrigger>
-          <SelectContent>
-            {countries.map((country) => (
-              <SelectItem 
-                key={country.country_code} 
-                value={country.country_code}
-              >
-                {country.name} ({country.total_resorts} resorts)
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-
-      {/* Total Slopes Range */}
-      <div className="space-y-4">
-        <Label>Total Slopes Range</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            placeholder="Min slopes"
-            {...register('total_slopes_min', { valueAsNumber: true })}
-          />
-          <Input
-            type="number"
-            placeholder="Max slopes"
-            {...register('total_slopes_max', { valueAsNumber: true })}
-          />
-        </div>
-      </div>
-
-
-      {/* Snow Parks Range */}
-      <div className="space-y-4">
-        <Label>Snow Parks Range</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            placeholder="Min snow parks"
-            {...register('snow_parks_min', { valueAsNumber: true })}
-          />
-          <Input
-            type="number"
-            placeholder="Max snow parks"
-            {...register('snow_parks_max', { valueAsNumber: true })}
-          />
-        </div>
-      </div>
-
-
-      {/* Ski Lifts Range */}
-      <div className="space-y-4">
-        <Label>Ski Lifts Range</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            placeholder="Min ski lifts"
-            {...register('ski_lifts_min', { valueAsNumber: true })}
-          />
-          <Input
-            type="number"
-            placeholder="Max ski lifts"
-            {...register('ski_lifts_max', { valueAsNumber: true })}
-          />
-        </div>
-      </div>
-
-
-      {/* Adult Day Pass Range */}
-      <div className="space-y-4">
-        <Label>Adult Day Pass Range</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            placeholder="Min price"
-            {...register('adult_day_pass_min', { valueAsNumber: true })}
-          />
-          <Input
-            type="number"
-            placeholder="Max price"
-            {...register('adult_day_pass_max', { valueAsNumber: true })}
-          />
-        </div>
-      </div>
-
-
-      {/* Night Skiing */}
-      <div className="space-y-4">
-        <Label>Night Skiing</Label>
-        <Select 
-          onValueChange={(value) => setValue('night_skiing', value === '1' ? 1 : 0)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Night Skiing" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">Available</SelectItem>
-            <SelectItem value="0">Not Available</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
 
       <Button type="submit" className="w-full">
         Find Resorts
