@@ -2,40 +2,56 @@ export interface SkiResort {
   resort_id: string;
   name: string;
   country_code: string;
-  region: string;
-  latitude: number;
-  longitude: number;
-  beginner_percentage: number;
-  intermediate_percentage: number;
-  advanced_percentage: number;
+  region?: string;
   total_slopes: number;
-  snow_parks: number;
-  night_skiing: number;
-  ski_lifts: number;
+  snow_parks?: number;
+  ski_lifts?: number;
   adult_day_pass: number;
-  currency: string;
-  season_start: string;
-  season_end: string;
-  image_url: string;
+  currency?: string;
+  night_skiing: 0 | 1;
+  image_url?: string;
 }
 
-export interface WeatherData {
-  currentWeather: {
-    temperature: number;
-    feels_like: number;
-    weather_description: string;
-    wind_gust: number;
-    humidity: number;
-    uv_index: number;
-  };
-  forecast: Array<{
-    forecast_date: string;
-    temperature_max: number;
-    temperature_min: number;
-    feels_like_day: number;
-    feels_like_night: number;
-    precipitation_probability: number;
-    weather_description: string;
-    snow_amount: number;
-  }>;
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+
+export interface ResortFilters {
+  // 基本查询
+  name?: string;
+  country_code?: string;
+  region?: string;
+
+
+  // 数值范围查询
+  total_slopes_min?: number;
+  total_slopes_max?: number;
+  snow_parks_min?: number;
+  snow_parks_max?: number;
+  ski_lifts_min?: number;
+  ski_lifts_max?: number;
+  adult_day_pass_min?: number;
+  adult_day_pass_max?: number;
+
+
+  // 特定条件
+  night_skiing?: 0 | 1;
+
+
+  // 分页
+  page?: number;
+  limit?: number;
+}
+
+
+export interface Country {
+  country_code: string;
+  name: string;
+  weather_agency: string;
+  total_resorts: number;
 }
