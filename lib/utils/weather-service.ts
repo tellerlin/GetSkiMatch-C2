@@ -1,8 +1,20 @@
-import mockWeather from '@/data/mock-weather.json';
+const API_BASE_URL = 'https://ski-query-worker.3we.org';
 
 export async function getWeatherData(resortId: string) {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-
-  return mockWeather[resortId as keyof typeof mockWeather] || null;
+  try {
+    const response = await fetch(`${API_BASE_URL}/resort?id=${resortId}`);
+    const data = await response.json();
+    
+    if (data.error) {
+      return null;
+    }
+    
+    return {
+      currentWeather: data.currentWeather,
+      forecast: data.forecast
+    };
+  } catch (error) {
+    console.error('Error fetching weather data:', error);
+    return null;
+  }
 }

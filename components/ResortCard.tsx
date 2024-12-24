@@ -7,7 +7,7 @@ import { Snowflake, Mountain, DollarSign, Wind, Thermometer } from 'lucide-react
 import type { SkiResort } from '@/lib/types';
 
 interface ResortCardProps {
-  resort: SkiResort & { matchScore: number };
+  resort: SkiResort & { matchScore?: number };
   weather?: any;
 }
 
@@ -16,40 +16,24 @@ export default function ResortCard({ resort, weather }: ResortCardProps) {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative h-48">
         <Image
-          src={resort.imageUrl}
+          src={resort.image_url}
           alt={resort.name}
           fill
           className="object-cover"
         />
-        <div className="absolute top-4 right-4 flex flex-col gap-2">
-          <Badge variant="secondary" className="bg-white/90 text-blue-600">
-            {resort.matchScore}% Match
-          </Badge>
-          {weather && (
-            <div className="flex flex-col gap-1">
-              <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
-                <Thermometer className="h-3 w-3" />
-                {weather.current.temp}°C
-              </Badge>
-              <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
-                <Wind className="h-3 w-3" />
-                {weather.current.wind_speed} m/s
-              </Badge>
-              {weather.current.weather[0].main.toLowerCase().includes('snow') && (
-                <Badge variant="secondary" className="bg-white/90 flex items-center gap-1">
-                  <Snowflake className="h-3 w-3" />
-                  Snowing
-                </Badge>
-              )}
-            </div>
-          )}
-        </div>
+        {resort.matchScore !== undefined && (
+          <div className="absolute top-4 right-4">
+            <Badge variant="secondary" className="bg-white/90 text-blue-600">
+              {resort.matchScore}% Match
+            </Badge>
+          </div>
+        )}
       </div>
       
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-2">{resort.name}</h2>
         <p className="text-gray-600 mb-4">
-          {resort.location.region}, {resort.location.country}
+          {resort.region}, {resort.country_code}
         </p>
         
         <div className="space-y-4">
@@ -58,9 +42,9 @@ export default function ResortCard({ resort, weather }: ResortCardProps) {
             <div className="flex-1">
               <div className="flex justify-between text-sm mb-1">
                 <span>Beginner</span>
-                <span>{resort.difficulty.beginner}%</span>
+                <span>{resort.beginner_percentage}%</span>
               </div>
-              <Progress value={resort.difficulty.beginner} />
+              <Progress value={resort.beginner_percentage} />
             </div>
           </div>
           
@@ -69,22 +53,22 @@ export default function ResortCard({ resort, weather }: ResortCardProps) {
             <div className="flex-1">
               <div className="flex justify-between text-sm mb-1">
                 <span>Advanced</span>
-                <span>{resort.difficulty.advanced}%</span>
+                <span>{resort.advanced_percentage}%</span>
               </div>
-              <Progress value={resort.difficulty.advanced} />
+              <Progress value={resort.advanced_percentage} />
             </div>
           </div>
           
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-blue-500" />
             <span className="text-sm">
-              Day Pass: ${resort.pricing.adultDayPass}
+              Day Pass: {resort.adult_day_pass} {resort.currency}
             </span>
           </div>
         </div>
         
         <Link
-          href={`/ski-resort/${resort.id}`}
+          href={`/ski-resort/${resort.resort_id}`}
           className="mt-6 inline-block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
         >
           View Details

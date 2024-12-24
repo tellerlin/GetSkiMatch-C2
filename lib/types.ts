@@ -1,73 +1,73 @@
+// Update types to match API response
 export interface SkiResort {
-  id: string;
+  resort_id: string;
   name: string;
-  location: {
-    lat: number;
-    lon: number;
-    country: string;
-    region: string;
+  country_code: string;
+  region: string;
+  latitude: number;
+  longitude: number;
+  beginner_percentage: number;
+  intermediate_percentage: number;
+  advanced_percentage: number;
+  total_slopes: number;
+  snow_parks: number;
+  night_skiing: number;
+  ski_lifts: number;
+  adult_day_pass: number;
+  currency: string;
+  season_start: string;
+  season_end: string;
+  image_url: string;
+}
+
+export interface WeatherData {
+  currentWeather: {
+    resort_id: string;
+    timestamp: number;
+    temperature: number;
+    feels_like: number;
+    pressure: number;
+    humidity: number;
+    weather_description: string;
+    uv_index: number;
+    wind_gust: number;
+    cloudiness: number;
   };
-  difficulty: {
-    beginner: number;    // Percentage of beginner slopes
-    intermediate: number; // Percentage of intermediate slopes
-    advanced: number;    // Percentage of advanced slopes
-  };
-  features: {
-    totalSlopes: number;
-    snowParks: number;
-    nightSkiing: boolean;
-    skiLifts: number;
-  };
-  pricing: {
-    adultDayPass: number;
-    currency: string;
-  };
-  season: {
-    start: string;  // MM-DD format
-    end: string;    // MM-DD format
-  };
-  imageUrl: string;
+  forecast: Array<{
+    forecast_date: string;
+    temperature_max: number;
+    temperature_min: number;
+    feels_like_day: number;
+    feels_like_night: number;
+    precipitation_probability: number;
+    weather_main: string;
+    weather_description: string;
+    wind_speed: number;
+    wind_direction: number;
+    snow_amount: number;
+    rain_amount: number;
+    uv_index: number;
+    wind_gust: number;
+    cloudiness: number;
+  }>;
+}
+
+export interface Country {
+  country_code: string;
+  name: string;
+  weather_agency: string;
+  total_resorts: number;
 }
 
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced';
 export type TerrainPreference = 'groomed' | 'powder' | 'park' | 'backcountry';
-export type WeatherPreference = 'snow' | 'sun' | 'any';
 
 export interface UserPreferences {
   skillLevel: SkillLevel;
   terrainPreferences: TerrainPreference[];
-  weatherPreference: WeatherPreference;
   budgetRange: {
     min: number;
     max: number;
   };
   country: string;
-}
-
-export interface WeatherData {
-  current: {
-    temp: number;
-    feels_like: number;
-    humidity: number;
-    wind_speed: number;
-    weather: Array<{
-      main: string;
-      description: string;
-      icon: string;
-    }>;
-  };
-  daily: Array<{
-    temp: {
-      min: number;
-      max: number;
-    };
-    pop: number;
-    snow?: number;
-  }>;
-  alerts?: Array<{
-    event: string;
-    description: string;
-    start: number;
-    end: number;
-  }>;
 }
