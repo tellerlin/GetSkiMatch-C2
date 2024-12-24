@@ -50,7 +50,7 @@ export default function WeatherInfo({ weather }: WeatherInfoProps) {
         <div className="mt-6">
           <h3 className="font-medium mb-3">Forecast</h3>
           <div className="space-y-2">
-            {forecast.slice(0, 3).map((day, index) => (
+            {forecast.slice(0, 8).map((day, index) => (
               <div key={index} className="flex justify-between items-center text-sm">
                 <span>{new Date(day.forecast_date).toLocaleDateString()}</span>
                 <div className="text-right">
