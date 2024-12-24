@@ -5,7 +5,7 @@ import { getFilteredResorts } from '@/lib/utils/resort-service';
 import { getCountries } from '@/lib/utils/resort-service';
 import FilterForm from '@/components/filters/FilterForm';
 import Pagination from '@/components/filters/Pagination';
-import ResortCard from '@/components/ResortCard';
+import ResortList from '@/components/resort/ResortList';
 import { ResortFilters } from '@/lib/types/filters';
 import { Loader2 } from 'lucide-react';
 
@@ -26,15 +26,24 @@ export default function ResortsPage() {
 
   const loadResorts = async () => {
     setLoading(true);
-    const { resorts, pagination } = await getFilteredResorts(filters);
-    setResorts(resorts);
-    setPagination(pagination);
-    setLoading(false);
+    try {
+      const { resorts, pagination } = await getFilteredResorts(filters);
+      setResorts(resorts);
+      setPagination(pagination);
+    } catch (error) {
+      console.error('Error loading resorts:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadCountries = async () => {
-    const countriesData = await getCountries();
-    setCountries(countriesData);
+    try {
+      const countriesData = await getCountries();
+      setCountries(countriesData);
+    } catch (error) {
+      console.error('Error loading countries:', error);
+    }
   };
 
   const handleFilter = async (newFilters: ResortFilters) => {
@@ -75,10 +84,8 @@ export default function ResortsPage() {
 
         <FilterForm onFilter={handleFilter} countries={countries} />
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {resorts.map(resort => (
-            <ResortCard key={resort.resort_id} resort={resort} />
-          ))}
+        <div className="mt-8">
+          <ResortList resorts={resorts} />
         </div>
 
         {pagination && (

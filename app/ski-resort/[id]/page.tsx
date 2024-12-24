@@ -1,14 +1,20 @@
 import { Suspense } from 'react';
-import ResortContent from '@/components/resort/ResortContent';
-import WeatherSummary from '@/components/weather/WeatherSummary';
-import WeatherAlert from '@/components/weather/WeatherAlert';
-import { Loader2 } from 'lucide-react';
-import { getResortById } from '@/lib/utils/resort-service';
+import { getFilteredResorts, getResortById } from '@/lib/utils/resort-service';
 import { getWeatherData } from '@/lib/utils/weather-service';
+import ResortHeader from '@/components/resort/ResortHeader';
+import ResortDetails from '@/components/resort/ResortDetails';
+import WeatherInfo from '@/components/weather/WeatherInfo';
+import { Loader2 } from 'lucide-react';
 
+// Generate static params for all resorts
 export async function generateStaticParams() {
-  const resortIds = ['whistler-blackcomb', 'zermatt', 'niseko-united'];
-  return resortIds.map((id) => ({ id }));
+  const { resorts } = await getFilteredResorts({
+    limit: 1000 // Get all resorts
+  });
+  
+  return resorts.map((resort) => ({
+    id: resort.resort_id
+  }));
 }
 
 export default async function ResortDetailPage({ params }: { params: { id: string } }) {
@@ -32,17 +38,18 @@ export default async function ResortDetailPage({ params }: { params: { id: strin
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
       }>
-        <ResortContent resort={resort} />
+        <ResortHeader resort={resort} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <ResortDetails resort={resort} />
+            </div>
+            <div>
+              <WeatherInfo weather={weather} />
+            </div>
+          </div>
+        </div>
       </Suspense>
-
-      {weather && (
-        <>
-          {weather.alerts?.map((alert, index) => (
-            <WeatherAlert key={index} alert={alert} />
-          ))}
-          <WeatherSummary weather={weather} />
-        </>
-      )}
     </div>
   );
 }
