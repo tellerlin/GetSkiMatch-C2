@@ -136,9 +136,9 @@ export default function PreferencesForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
-        Find Resorts
-      </Button>
+<Button type="submit" className="w-full text-white">
+  Find Resorts
+</Button>
     </form>
   );
 }

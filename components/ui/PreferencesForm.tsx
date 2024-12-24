@@ -40,7 +40,9 @@ export default function PreferencesForm() {
       }
     });
     
-    router.push(`/resorts?${queryParams.toString()}`);
+    const url = new URL(`/resorts`, window.location.origin);
+    url.search = queryParams.toString();
+    router.push(url.toString());
   };
 
 

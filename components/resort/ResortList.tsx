@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 import Pagination from '../filters/Pagination';
 
 export default function ResortList() {
-  const [resorts, setResorts] = useState<SkiResort[]>([]);
+  const [resorts, setResorts] = useState<Array<SkiResort & { night_skiing: 0 | 1 }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
