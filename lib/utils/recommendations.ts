@@ -1,21 +1,11 @@
 import { SkiResort, UserPreferences } from '../types';
 
 export function calculateMatchScore(resort: SkiResort, preferences: UserPreferences): number {
-  let score = 0;
-  
-  // Skill level match (0-40 points)
   const skillLevelMatch = calculateSkillLevelMatch(resort, preferences.skillLevel);
-  score += skillLevelMatch * 40;
-  
-  // Budget match (0-30 points)
   const budgetMatch = calculateBudgetMatch(resort, preferences.budgetRange);
-  score += budgetMatch * 30;
-  
-  // Terrain preferences match (0-30 points)
   const terrainMatch = calculateTerrainMatch(resort, preferences.terrainPreferences);
-  score += terrainMatch * 30;
   
-  return Math.round(score);
+  return Math.round(skillLevelMatch * 40 + budgetMatch * 30 + terrainMatch * 30);
 }
 
 function calculateSkillLevelMatch(resort: SkiResort, skillLevel: UserPreferences['skillLevel']): number {
@@ -36,11 +26,10 @@ function calculateSkillLevelMatch(resort: SkiResort, skillLevel: UserPreferences
 function calculateBudgetMatch(resort: SkiResort, budgetRange: UserPreferences['budgetRange']): number {
   const price = resort.pricing.adultDayPass;
   
-  if (price <= budgetRange.min) return 0.8; // Slightly penalize very cheap options
+  if (price <= budgetRange.min) return 0.8;
   if (price > budgetRange.max) return 0;
   if (price <= (budgetRange.min + budgetRange.max) / 2) return 1;
   
-  // Linear decrease from middle of budget to max
   return 1 - ((price - (budgetRange.min + budgetRange.max) / 2) / (budgetRange.max - (budgetRange.min + budgetRange.max) / 2));
 }
 

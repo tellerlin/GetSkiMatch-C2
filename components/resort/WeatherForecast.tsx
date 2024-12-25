@@ -218,11 +218,11 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   </div>
                 </div>
 
-                {/* UV & Visibility Section */}
+                {/* UV Section */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Sun className="h-4 w-4" />
-                    <span>UV & Visibility</span>
+                    <span>UV</span>
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">
