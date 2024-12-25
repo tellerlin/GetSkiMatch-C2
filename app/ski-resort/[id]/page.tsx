@@ -1,11 +1,11 @@
-// page.tsx
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getFilteredResorts, getResortById } from '@/lib/utils/resort-service';
-import { getWeatherData } from '@/lib/utils/weather-service';
-import ResortContent from '@/components/resort/ResortContent'; // 引入ResortContent
+import { getFilteredResorts, getResortById } from 'lib/utils/resort-service';
+import { getWeatherData } from 'lib/utils/weather-service';
+import ResortContent from 'components/resort/ResortContent';
+import { SkiResort, WeatherData } from 'lib/types';
 import { Loader2 } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from 'components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 interface PageProps {
@@ -21,9 +21,9 @@ export async function generateStaticParams() {
     const { resorts } = await getFilteredResorts({
       limit: 1000
     });
-    
+  
     console.log(`Generated params for ${resorts.length} resorts`);
-    return resorts.map((resort) => ({
+    return resorts.map((resort: SkiResort) => ({
       id: resort.resort_id
     }));
   } catch (error) {
@@ -33,7 +33,10 @@ export async function generateStaticParams() {
 }
 
 // Metadata generation (保持不变)
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<{
+  title: string;
+  description: string;
+}> {
   try {
     console.log('Generating metadata for resort ID:', params.id);
     const resort = await getResortById(params.id);
@@ -47,7 +50,7 @@ export async function generateMetadata({ params }: PageProps) {
 
     return {
       title: `${resort.name} - Ski Resort Details`,
-      description: `Discover ${resort.name} ski resort in ${resort.region}, ${resort.country}.`
+      description: `Discover ${resort.name} ski resort in ${resort.region}, ${resort.country_code}.`
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
@@ -92,10 +95,10 @@ function ErrorState({ message, error }: { message: string; error?: Error }) {
 export default async function ResortDetailPage({ params }: PageProps) {
   try {
     console.log('Fetching data for resort ID:', params.id);
-    
+  
     const [resortData, weatherData] = await Promise.all([
-      getResortById(params.id),
-      getWeatherData(params.id)
+      getResortById(params.id) as Promise<SkiResort | null>,
+      getWeatherData(params.id) as Promise<WeatherData | null>
     ]);
 
     if (!resortData) {

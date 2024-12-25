@@ -1,3 +1,4 @@
+// WeatherForecast.tsx
 import { WeatherData } from '@/lib/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -140,6 +141,10 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
           const conditionBadge = getConditionBadge(day.conditions);
           const formattedDate = formatDateSafely(day.date);
 
+          const temperature = day.temperature || {};
+          const wind = day.wind || {};
+          const conditions = day.conditions || {};
+
           return (
             <div 
               key={index} 
@@ -161,13 +166,13 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">
-                      {day.temperature.max.toFixed(1)}°C / {day.temperature.min.toFixed(1)}°C
+                      {temperature.max?.toFixed(1) || 'N/A'}°C / {temperature.min?.toFixed(1) || 'N/A'}°C
                     </p>
                     <div className="text-sm text-gray-500 space-y-1">
-                      <p>Feels like {day.temperature.feelsLikeDay.toFixed(1)}°C</p>
-                      <p>Morning: {day.temperature.morn.toFixed(1)}°C</p>
-                      <p>Evening: {day.temperature.eve.toFixed(1)}°C</p>
-                      <p>Night: {day.temperature.night.toFixed(1)}°C</p>
+                      <p>Feels like {temperature.feelsLikeDay?.toFixed(1) || 'N/A'}°C</p>
+                      <p>Morning: {temperature.morn?.toFixed(1) || 'N/A'}°C</p>
+                      <p>Evening: {temperature.eve?.toFixed(1) || 'N/A'}°C</p>
+                      <p>Night: {temperature.night?.toFixed(1) || 'N/A'}°C</p>
                     </div>
                   </div>
                 </div>
@@ -180,14 +185,14 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">
-                      {day.wind.speed.toFixed(1)} m/s
+                      {wind.speed?.toFixed(1) || 'N/A'} m/s
                     </p>
                     <div className="text-sm text-gray-500 space-y-1">
-                      <p>Direction: {getWindDirection(day.wind.deg)}</p>
-                      {day.wind.gust > day.wind.speed * 1.5 && (
-                        <p>Gusts up to {day.wind.gust.toFixed(1)} m/s</p>
+                      <p>Direction: {getWindDirection(wind.deg || 0)}</p>
+                      {wind.gust > (wind.speed || 0) * 1.5 && (
+                        <p>Gusts up to {wind.gust?.toFixed(1) || 'N/A'} m/s</p>
                       )}
-                      <p>Pressure: {day.wind.pressure}hPa</p>
+                      <p>Pressure: {wind.pressure || 'N/A'}hPa</p>
                     </div>
                   </div>
                 </div>
@@ -200,20 +205,20 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">
-                      {(day.conditions.precipitationProbability * 100).toFixed(0)}%
+                      {(conditions.precipitationProbability * 100)?.toFixed(0) || 'N/A'}%
                     </p>
                     <div className="text-sm text-gray-500 space-y-1">
-                      {day.conditions.snowAmount > 0 && (
+                      {conditions.snowAmount > 0 && (
                         <p className="text-blue-600">
-                          Snow: {day.conditions.snowAmount.toFixed(1)}mm
+                          Snow: {conditions.snowAmount?.toFixed(1) || 'N/A'}mm
                         </p>
                       )}
-                      {day.conditions.rainAmount > 0 && (
+                      {conditions.rainAmount > 0 && (
                         <p className="text-green-600">
-                          Rain: {day.conditions.rainAmount.toFixed(1)}mm
+                          Rain: {conditions.rainAmount?.toFixed(1) || 'N/A'}mm
                         </p>
                       )}
-                      <p>Humidity: {day.conditions.humidity}%</p>
+                      <p>Humidity: {conditions.humidity || 'N/A'}%</p>
                     </div>
                   </div>
                 </div>
@@ -226,25 +231,25 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="font-medium">
-                      UV Index: {day.uvIndex}
+                      UV Index: {day.uvIndex || 'N/A'}
                     </p>
                     <div className="text-sm text-gray-500 space-y-1">
-                      <p>Cloud Cover: {day.cloudiness}%</p>
-                      <p>Visibility: {day.conditions.visibility}km</p>
-                      <p>Sunrise: {formatDateSafely(day.conditions.sunrise, 'HH:mm')}</p>
-                      <p>Sunset: {formatDateSafely(day.conditions.sunset, 'HH:mm')}</p>
+                      <p>Cloud Cover: {day.cloudiness || 'N/A'}%</p>
+                      <p>Visibility: {conditions.visibility || 'N/A'}km</p>
+                      <p>Sunrise: {formatDateSafely(conditions.sunrise, 'HH:mm')}</p>
+                      <p>Sunset: {formatDateSafely(conditions.sunset, 'HH:mm')}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Weather Alerts */}
-              {(day.conditions.snowAmount > 20 || day.wind.gust > 15) && (
+              {(conditions.snowAmount > 20 || wind.gust > 15) && (
                 <div className="mt-2 p-2 bg-yellow-50 rounded-lg">
                   <div className="flex items-center gap-2 text-yellow-700">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="text-sm font-medium">
-                      {day.conditions.snowAmount > 20 ? 'Heavy snowfall expected' : 'Strong winds expected'}
+                      {conditions.snowAmount > 20 ? 'Heavy snowfall expected' : 'Strong winds expected'}
                     </span>
                   </div>
                 </div>

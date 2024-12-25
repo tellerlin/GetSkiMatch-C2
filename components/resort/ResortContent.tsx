@@ -1,15 +1,14 @@
-// ResortContent.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SkiResort, WeatherData } from '@/lib/types';
+import { SkiResort, WeatherData } from 'lib/types';
 import ResortHeader from './ResortHeader';
 import TerrainOverview from './TerrainOverview';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
 import WeatherForecast from './WeatherForecast';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from 'components/ui/alert';
 
 // 日志初始化
 console.log('ResortContent component loaded');
@@ -102,7 +101,7 @@ export default function ResortContent({ initialData, params }: ResortContentProp
     }
 
     performance.mark('resortContentMount');
-    
+  
     return () => {
       console.log('ResortContent unmounting');
       performance.measure('ResortContent Lifetime', 'resortContentMount');
@@ -144,7 +143,7 @@ export default function ResortContent({ initialData, params }: ResortContentProp
     <ErrorBoundary>
       <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
         <ResortHeader resort={resortData} />
-        
+      
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-8">
@@ -155,13 +154,15 @@ export default function ResortContent({ initialData, params }: ResortContentProp
               />
               <ResortFeatures resort={resortData} />
             </div>
-            
+          
             <div>
               {weather ? (
                 <>
-                  <div className="mb-2 text-xs text-gray-400">
-                    Last updated: {new Date(weather.currentWeather.timestamp).toLocaleString()}
-                  </div>
+                  {weather.currentWeather?.timestamp && (
+                    <div className="mb-2 text-xs text-gray-400">
+                      Last updated: {new Date(weather.currentWeather.timestamp).toLocaleString()}
+                    </div>
+                  )}
                   <WeatherForecast weather={weather} />
                 </>
               ) : (

@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "lib/*": ["./lib/*"],
+      "components/ui/*": ["./components/ui/*"],
+      "components/resort/*": ["./components/resort/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
