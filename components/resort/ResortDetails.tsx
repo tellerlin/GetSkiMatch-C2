@@ -168,12 +168,18 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
         <h3 className="text-lg font-semibold mb-4">Resort Features</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
-            <Badge variant={resort.night_skiing ? "default" : "secondary"}>
+            <Badge 
+              variant={resort.night_skiing ? "default" : "secondary"}
+              className={resort.night_skiing ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+            >
               {resort.night_skiing ? "Night Skiing Available" : "No Night Skiing"}
             </Badge>
           </div>
           <div>
-            <Badge variant="secondary">
+            <Badge 
+              variant="default"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               {resort.snow_parks} Snow Parks
             </Badge>
           </div>

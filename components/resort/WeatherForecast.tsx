@@ -35,18 +35,18 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
     rainAmount: number;
   }) => {
     if (conditions.snowAmount > 20) {
-      return { label: 'Heavy Snow', color: 'bg-blue-500 text-white' };
+      return { label: 'Heavy Snow', color: 'bg-blue-600 text-white' };
     }
     if (conditions.snowAmount > 5) {
-      return { label: 'Snow', color: 'bg-blue-200 text-blue-800' };
+      return { label: 'Snow', color: 'bg-blue-500 text-white' };
     }
     if (conditions.rainAmount > 0) {
-      return { label: 'Rain', color: 'bg-yellow-200 text-yellow-800' };
+      return { label: 'Rain', color: 'bg-yellow-500 text-white' };
     }
     if (conditions.precipitationProbability > 0.5) {
-      return { label: 'Precipitation Likely', color: 'bg-gray-200 text-gray-800' };
+      return { label: 'Precipitation Likely', color: 'bg-gray-600 text-white' };
     }
-    return { label: 'Fair', color: 'bg-green-200 text-green-800' };
+    return { label: 'Fair', color: 'bg-green-600 text-white' };
   };
 
   return (
@@ -54,7 +54,7 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
       <h2 className="text-xl font-semibold mb-6">8-Day Forecast</h2>
       <div className="space-y-4">
         {weather.forecast.map((day, index) => {
-          const date = parseISO(day.date);
+          const date = new Date(day.date);
           const conditionBadge = getConditionBadge(day.conditions);
 
           return (
@@ -106,7 +106,7 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                   <p className="font-medium">
                     {(day.conditions.precipitationProbability * 100).toFixed(0)}%
                     {day.conditions.snowAmount > 0 && (
-                      <span className="block text-sm text-gray-500">
+                      <span className="block text-sm text-blue-600 font-medium">
                         Snow: {day.conditions.snowAmount.toFixed(1)}mm
                       </span>
                     )}
@@ -116,12 +116,12 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                 <div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <Sun className="h-4 w-4" />
-                    <span>Conditions</span>
+                    <span>UV & Visibility</span>
                   </div>
-                  <p className="font-medium capitalize">
-                    {day.conditions.description}
+                  <p className="font-medium">
+                    UV Index: {day.uvIndex}
                     <span className="block text-sm text-gray-500">
-                      UV Index: {day.uvIndex}
+                      Cloud Cover: {day.cloudiness}%
                     </span>
                   </p>
                 </div>
