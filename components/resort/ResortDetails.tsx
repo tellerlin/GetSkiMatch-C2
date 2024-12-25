@@ -1,94 +1,198 @@
+import { SkiResort } from '@/lib/types';
+import { WeatherData } from '@/lib/utils/weather-service';
 import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import type { SkiResort } from '@/lib/types';
-import { Snowflake, CableCar, Moon } from 'lucide-react';
-import { useMemo } from 'react';
+import { 
+  Mountain, 
+  ArrowUp, 
+  ArrowDown, 
+  Wind, 
+  Thermometer, 
+  CloudSnow,
+  Compass,
+  Sun,
+  Loader2,
+} from 'lucide-react';
 
 interface ResortDetailsProps {
-  resort: SkiResort;
+  resort: SkiResort | null;
+  weather: WeatherData | null;
+  isLoading?: boolean;
 }
 
-export default function ResortDetails({ resort }: ResortDetailsProps) {
-  // 使用 useMemo 缓存难度数据计算
-  const difficultyLevels = useMemo(() => [
-    { label: 'Beginner', percentage: resort.beginner_percentage ?? 0, color: 'bg-green-500' },
-    { label: 'Intermediate', percentage: resort.intermediate_percentage ?? 0, color: 'bg-blue-500' },
-    { label: 'Advanced', percentage: resort.advanced_percentage ?? 0, color: 'bg-red-500' },
-  ], [resort]);
+function ResortDetails({ resort, weather, isLoading = false }: ResortDetailsProps) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">Resort Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="p-6">
+            <div className="flex items-center justify-center h-48">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
-  // 使用 useMemo 缓存特征数据计算
-  const features = useMemo(() => [
-    {
-      icon: <Snowflake className="h-5 w-5 text-blue-600" aria-hidden="true" />,
-      title: 'Snow Parks',
-      description: resort.snow_parks != null 
-        ? `${resort.snow_parks} parks available`
-        : 'Data unavailable',
-    },
-    {
-      icon: <CableCar className="h-5 w-5 text-blue-600" aria-hidden="true" />,
-      title: 'Ski Lifts',
-      description: resort.ski_lifts != null 
-        ? `${resort.ski_lifts} lifts`
-        : 'Data unavailable',
-    },
-    {
-      icon: <Moon className="h-5 w-5 text-blue-600" aria-hidden="true" />,
-      title: 'Night Skiing',
-      description: (
-        <Badge
-          variant={resort.night_skiing ? 'default' : 'secondary'}
-          className="text-white transition-colors duration-200"
-        >
-          {resort.night_skiing ? 'Available' : 'Not Available'}
-        </Badge>
-      ),
-    },
-  ], [resort]);
+  if (!resort) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">Resort Details</h2>
+        <Card className="p-6">
+          <div className="text-center text-gray-500">
+            <Mountain className="h-12 w-12 mx-auto mb-2" />
+            <p>Resort information is currently unavailable</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Slope Difficulty Section */}
-      <Card className="p-6 transition-shadow duration-300 hover:shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Slope Difficulty</h2>
-        <div className="space-y-4">
-          {difficultyLevels.map(({ label, percentage, color }) => (
-            <div key={label}>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-medium">{label}</span>
-                <span className="text-gray-600">
-                  {percentage !== null ? `${percentage}%` : 'N/A'}
-                </span>
-              </div>
-              <Progress 
-                value={percentage} 
-                className={`transition-all duration-500 ${color}`}
-                aria-label={`${label} difficulty percentage`}
-              />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Resort Features Section */}
-      <Card className="p-6 transition-shadow duration-300 hover:shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Resort Features</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {features.map(({ icon, title, description }) => (
-            <div 
-              key={title} 
-              className="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200 hover:bg-gray-50"
-            >
-              {icon}
-              <div>
-                <p className="font-medium">{title}</p>
-                <div className="text-sm text-gray-600">{description}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <h2 className="text-2xl font-bold tracking-tight">Resort Details</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ElevationInfo resort={resort} />
+        <SnowConditions weather={weather} />
+      </div>
     </div>
   );
 }
+
+interface ElevationInfoProps {
+  resort: SkiResort;
+}
+
+const ElevationInfo = ({ resort }: ElevationInfoProps) => {
+  if (!resort.elevation || 
+      typeof resort.elevation.summit === 'undefined' || 
+      typeof resort.elevation.base === 'undefined') {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-gray-500">
+          <Mountain className="h-12 w-12 mx-auto mb-2" />
+          <p>Elevation information is not available</p>
+        </div>
+      </Card>
+    );
+  }
+
+  const verticalDrop = resort.elevation.summit - resort.elevation.base;
+
+  return (
+    <Card className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <Mountain className="h-6 w-6 text-blue-600" />
+          <h3 className="text-lg font-semibold">Elevation Details</h3>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <ArrowUp className="h-4 w-4" />
+              <span className="text-sm">Summit</span>
+            </div>
+            <p className="font-semibold">{resort.elevation.summit.toLocaleString()}m</p>
+          </div>
+          
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <ArrowDown className="h-4 w-4" />
+              <span className="text-sm">Base</span>
+            </div>
+            <p className="font-semibold">{resort.elevation.base.toLocaleString()}m</p>
+          </div>
+          
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Mountain className="h-4 w-4" />
+              <span className="text-sm">Vertical Drop</span>
+            </div>
+            <p className="font-semibold">{verticalDrop.toLocaleString()}m</p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+interface SnowConditionsProps {
+  weather: WeatherData | null;
+}
+
+
+const SnowConditions = ({ weather }: SnowConditionsProps) => {
+  if (!weather || !weather.currentWeather) {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-gray-500">
+          <CloudSnow className="h-12 w-12 mx-auto mb-2" />
+          <p>Weather information is currently unavailable</p>
+        </div>
+      </Card>
+    );
+  }
+
+  const { currentWeather } = weather;
+
+  return (
+    <Card className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <CloudSnow className="h-6 w-6 text-blue-600" />
+          <h3 className="text-lg font-semibold">Current Conditions</h3>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Thermometer className="h-4 w-4" />
+              <span className="text-sm">Temperature</span>
+            </div>
+            <p className="font-semibold">
+              {currentWeather.temperature.current}°C
+              <span className="text-sm text-gray-500 ml-1">
+                (Feels like {currentWeather.temperature.feels_like}°C)
+              </span>
+            </p>
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Wind className="h-4 w-4" />
+              <span className="text-sm">Wind</span>
+            </div>
+            <p className="font-semibold">
+              {currentWeather.wind.speed} m/s
+              <span className="text-sm text-gray-500 ml-1">
+                ({currentWeather.wind.direction}°)
+              </span>
+            </p>
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Cloud className="h-4 w-4" />
+              <span className="text-sm">Conditions</span>
+            </div>
+            <p className="font-semibold">{currentWeather.conditions.main}</p>
+            <p className="text-sm text-gray-500">{currentWeather.conditions.description}</p>
+          </div>
+
+          <div>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <CloudSnow className="h-4 w-4" />
+              <span className="text-sm">Snow</span>
+            </div>
+            <p className="font-semibold">{currentWeather.conditions.snowAmount}mm</p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+
+export default ResortDetails;

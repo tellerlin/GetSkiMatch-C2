@@ -2,61 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 现有的样式保持不变 */
+/* 基础样式 */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-background text-text;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+  }
+}
 
-/* 添加新的动画和交互样式 */
+/* 组件样式 */
+@layer components {
+  /* 滑块样式优化 */
+  .slider-track {
+    @apply h-2 rounded-full bg-blue-100;
+  }
+
+  .slider-range {
+    @apply h-2 rounded-full bg-blue-500;
+  }
+
+  .slider-thumb {
+    @apply w-4 h-4 rounded-full bg-white border-2 border-blue-500 cursor-pointer transition-transform duration-200;
+  }
+
+  .slider-thumb:hover {
+    @apply transform scale-110;
+  }
+
+  /* 特性按钮 */
+  .feature-button {
+    @apply transition-all duration-200 ease-in-out hover:-translate-y-0.5;
+  }
+
+  /* 响应式容器 */
+  .container-responsive {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* 卡片基础样式 */
+  .hover-card {
+    @apply transition-all duration-300 ease-in-out 
+           hover:-translate-y-1 hover:shadow-lg 
+           bg-white rounded-lg shadow-md;
+  }
+}
+
+/* 工具类 */
+@layer utilities {
+  /* 渐变背景 */
+  .gradient-bg {
+    @apply bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700;
+  }
+
+  /* 动画类 */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+/* 动画关键帧 */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+/* 过渡效果 */
+.transition-base {
+  @apply transition-all duration-300 ease-in-out;
 }
 
-/* 滑块样式优化 */
-.slider-track {
-  @apply h-2 rounded-full bg-blue-100;
+/* 焦点样式 */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
 
-.slider-range {
-  @apply h-2 rounded-full bg-blue-500;
+/* 加载状态 */
+.loading-skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
 }
 
-.slider-thumb {
-  @apply w-4 h-4 rounded-full bg-white border-2 border-blue-500 cursor-pointer;
-  transition: transform 0.2s;
+/* 响应式文本 */
+.text-responsive {
+  @apply text-base sm:text-lg md:text-xl;
 }
 
-.slider-thumb:hover {
-  @apply transform scale-110;
+/* 交互反馈 */
+.interactive {
+  @apply hover:scale-105 active:scale-95 transition-transform duration-150;
 }
 
-/* 特性按钮悬停效果 */
-.feature-button {
-  @apply transition-all duration-200;
-}
-
-.feature-button:hover {
-  @apply transform -translate-y-0.5;
-}
-
-/* 响应式容器 */
-.container-responsive {
-  @apply container mx-auto px-4 sm:px-6 lg:px-8;
-}
-
-/* 渐变背景 */
-.gradient-bg {
-  @apply bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700;
-}
-
-/* 卡片悬停效果 */
-.hover-card {
-  @apply transition-all duration-300;
-}
-
-.hover-card:hover {
-  @apply transform -translate-y-1 shadow-lg;
+/* 无障碍支持 */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }

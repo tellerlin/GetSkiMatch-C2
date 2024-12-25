@@ -1,134 +1,228 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Cloud, Thermometer, Wind, Droplets, Clock, Snowflake } from 'lucide-react';
+import { 
+  Cloud, Thermometer, Wind, Sun, Snowflake,
+  AlertTriangle, CloudSun, Droplets
+} from 'lucide-react';
 import { format } from 'date-fns';
+import { memo } from 'react';
+import { WeatherData } from '@/lib/types';
 
 interface WeatherInfoProps {
-  weather: any;
+  weather: WeatherData | null;
+  isLoading?: boolean;
+  error?: string;
 }
 
-export default function WeatherInfo({ weather }: WeatherInfoProps) {
-  if (!weather) return null;
+interface WeatherMetricProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  subValue?: string;
+}
 
-  const isSnowing = weather.current.weather[0].main.toLowerCase().includes('snow');
+const WeatherInfo = memo(({ weather, isLoading, error }: WeatherInfoProps) => {
+  if (isLoading) {
+    return (
+      <section className="w-full p-6 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+        <div className="space-y-4">
+          <div className="h-24 bg-gray-200 rounded"></div>
+          <div className="h-24 bg-gray-200 rounded"></div>
+        </div>
+      </section>
+    );
+  }
 
-  return (
-    <Tabs defaultValue="current" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="current">Current</TabsTrigger>
-        <TabsTrigger value="forecast">Forecast</TabsTrigger>
-      </TabsList>
+  if (error) {
+    return (
+      <section className="w-full p-6 text-center" role="alert">
+        <div className="text-red-500 mb-2">
+          <Cloud className="h-12 w-12 mx-auto mb-2" />
+          <p className="font-medium">{error}</p>
+        </div>
+        <p className="text-gray-600">Please check your connection or try again later</p>
+      </section>
+    );
+  }
 
-      <TabsContent value="current">
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Current Conditions</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Thermometer className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Temperature</p>
-                  <p className="font-medium">{weather.current.temp}°C</p>
-                  <p className="text-sm text-gray-500">
-                    Feels like {weather.current.feels_like}°C
-                  </p>
+  if (!weather) {
+    return (
+      <section className="w-full p-6 text-center">
+        <div className="text-gray-500">
+          <Cloud className="h-12 w-12 mx-auto mb-2" />
+          <p>Weather information is currently unavailable</p>
+        </div>
+      </section>
+    );
+  }
+
+  const formatTemperature = (temp: number) => Math.round(temp * 10) / 10;
+  const getWindDirection = (degrees: number) => {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    return directions[Math.round(degrees / 45) % 8];
+  };
+
+  const getSkiingConditionsBadge = (conditions: {
+    snowAmount: number;
+    rainAmount: number;
+    precipitationProbability: number;
+  }) => {
+    if (conditions.snowAmount > 20) return { label: 'Fresh Powder', color: 'bg-blue-500' };
+    if (conditions.snowAmount > 10) return { label: 'Good Skiing', color: 'bg-green-500' };
+    if (conditions.rainAmount > 0) return { label: 'Wet Conditions', color: 'bg-yellow-500' };
+    if (conditions.precipitationProbability > 50) return { label: 'Precipitation Likely', color: 'bg-yellow-500' };
+    return { label: 'Fair', color: 'bg-gray-500' };
+  };
+
+  const CurrentWeatherSection = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-4">
+        <WeatherMetric
+          icon={<Thermometer className="h-5 w-5 text-blue-600" />}
+          label="Temperature"
+          value={`${formatTemperature(weather.currentWeather.temperature.current)}°C`}
+          subValue={`Feels like ${formatTemperature(weather.currentWeather.temperature.feels_like)}°C`}
+        />
+        <WeatherMetric
+          icon={<Wind className="h-5 w-5 text-blue-600" />}
+          label="Wind"
+          value={`${weather.currentWeather.wind.speed} m/s`}
+          subValue={`Gusts up to ${weather.currentWeather.wind.gust} m/s`}
+        />
+        <WeatherMetric
+          icon={<CloudSun className="h-5 w-5 text-blue-600" />}
+          label="Cloudiness"
+          value={`${weather.currentWeather.cloudiness}%`}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
+          <div className="space-y-2">
+            <Badge className="mr-2">
+              {weather.currentWeather.conditions.main}
+            </Badge>
+            {weather.currentWeather.conditions.snowAmount > 0 && (
+              <Badge className="mr-2">
+                Fresh Snow {weather.currentWeather.conditions.snowAmount}mm
+              </Badge>
+            )}
+            {weather.currentWeather.conditions.precipitationProbability > 0 && (
+              <Badge className="mr-2">
+                Precipitation {weather.currentWeather.conditions.precipitationProbability}%
+              </Badge>
+            )}
+            {weather.currentWeather.wind.speed > 15 && (
+              <Badge variant="destructive">Strong Winds</Badge>
+            )}
+          </div>
+          <p className="text-sm text-blue-700 mt-2">
+            {weather.currentWeather.conditions.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ForecastSection = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium mb-3">5-Day Forecast</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {weather.forecast.map((day, index) => (
+            <Card key={index} className="p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium">
+                  {format(new Date(day.date), 'MMM dd')}
+                </span>
+                <Badge className={getSkiingConditionsBadge(day.conditions).color}>
+                  {getSkiingConditionsBadge(day.conditions).label}
+                </Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Thermometer className="h-4 w-4" />
+                  <span>
+                    {formatTemperature(day.temperature.max)}°C / {formatTemperature(day.temperature.min)}°C
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Wind className="h-4 w-4" />
+                  <span>
+                    {day.wind.speed}m/s
+                    <span className="text-sm text-gray-500 ml-1">
+                      (gusts {day.wind.gust}m/s)
+                    </span>
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Droplets className="h-4 w-4" />
+                  <span>{day.conditions.precipitationProbability}% precipitation</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Sun className="h-4 w-4" />
+                  <span>UV Index: {day.uvIndex}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Wind className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Wind Speed</p>
-                  <p className="font-medium">{weather.current.wind_speed} m/s</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Droplets className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Humidity</p>
-                  <p className="font-medium">{weather.current.humidity}%</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {isSnowing && (
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Snowflake className="h-5 w-5 text-blue-600" />
-                    <h3 className="font-medium text-blue-800">Fresh Snow!</h3>
-                  </div>
-                  <p className="text-sm text-blue-700">
-                    Perfect conditions for skiing with fresh powder snow.
-                  </p>
+              {(day.conditions.snowAmount > 20 || day.wind.speed > 15) && (
+                <div className="mt-2 p-2 bg-yellow-50 rounded text-sm">
+                  <AlertTriangle className="h-4 w-4 inline mr-1 text-yellow-500" />
+                  {day.conditions.snowAmount > 20 ? 'Heavy Snowfall Expected' : 'Strong Winds Expected'}
                 </div>
               )}
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Today's Overview</h3>
-                <p className="text-sm text-gray-600">
-                  {weather.summary.ai_generated}
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value="forecast">
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Weather Forecast</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium mb-3">Hourly Forecast</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {weather.hourly.slice(0, 6).map((hour: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm">
-                        {format(new Date(hour.dt * 1000), 'HH:mm')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{hour.temp}°C</span>
-                      {hour.snow && (
-                        <Badge variant="secondary" className="bg-blue-100">
-                          <Snowflake className="h-3 w-3 mr-1" />
-                          {hour.snow['1h']}cm
-                        </Badge>
-                      )}
-                      <Badge variant="secondary">
-                        <Wind className="h-3 w-3 mr-1" />
-                        {hour.wind_speed}m/s
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium mb-3">Weekly Overview</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600">
-                  {weather.summary.weekly_overview}
-                </p>
-                {weather.daily[0].snow && (
-                  <div className="mt-3 flex items-center gap-2 text-sm text-blue-600">
-                    <Snowflake className="h-4 w-4" />
-                    <span>Expected snowfall: {weather.daily[0].snow}cm</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Card>
-      </TabsContent>
-    </Tabs>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
   );
-}
+
+  return (
+    <section className="w-full" role="region" aria-label="Weather Information">
+      <Tabs defaultValue="current" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="current">Current Weather</TabsTrigger>
+          <TabsTrigger value="forecast">Forecast</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="current">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Current Conditions</h2>
+            <CurrentWeatherSection />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="forecast">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Weather Forecast</h2>
+            <ForecastSection />
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </section>
+  );
+});
+
+const WeatherMetric = memo(({ icon, label, value, subValue }: WeatherMetricProps) => (
+  <div className="flex items-center gap-3" role="group" aria-label={label}>
+    {icon}
+    <div>
+      <p className="text-sm text-gray-600">{label}</p>
+      <p className="font-medium">{value}</p>
+      {subValue && <p className="text-sm text-gray-500">{subValue}</p>}
+    </div>
+  </div>
+));
+
+WeatherInfo.displayName = 'WeatherInfo';
+WeatherMetric.displayName = 'WeatherMetric';
+
+export default WeatherInfo;
