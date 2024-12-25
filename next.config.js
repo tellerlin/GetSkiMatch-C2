@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   output: 'export',
   eslint: {
@@ -7,7 +9,11 @@ const nextConfig = {
   images: { 
     unoptimized: true 
   },
-  optimizeFonts: true
+  optimizeFonts: true,
+  webpack: (config) => {
+    config.resolve.alias['@'] = path.resolve(__dirname);
+    return config;
+  },
 };
 
 module.exports = nextConfig;
