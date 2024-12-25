@@ -6,7 +6,6 @@ import { SkiResort } from '@/lib/types';
 import { getResortById } from '@/lib/utils/resort-service';
 import { getWeatherData, type WeatherData } from '@/lib/utils/weather-service';
 import ResortHeader from './ResortHeader';
-import WeatherInfo from './WeatherInfo';
 import TerrainOverview from './TerrainOverview';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
@@ -32,8 +31,6 @@ export default function ResortContent() {
   const [loading, setLoading] = useState<LoadingState>({ resort: true, weather: true });
   const [error, setError] = useState<ErrorState>({});
 
-
-  // ResortContent.tsx
   useEffect(() => {
     const loadResortData = async () => {
       if (typeof id !== 'string') {
@@ -50,8 +47,14 @@ export default function ResortContent() {
         console.log('Resort data received:', resortData);
 
         if (resortData) {
-          // 设置度假村数据
-          setResort(resortData.resort); // 注意这里改为 resortData.resort
+          // 设置度假村数据，包括elevation信息
+          setResort({
+            ...resortData.resort,
+            elevation: {
+              summit: resortData.resort.elevation?.summit || 2284,
+              base: resortData.resort.elevation?.base || 675
+            }
+          });
 
           // 设置天气数据
           if (resortData.currentWeather && resortData.forecast) {
@@ -81,7 +84,6 @@ export default function ResortContent() {
 
     loadResortData();
   }, [id]);
-
 
   if (loading.resort || loading.weather) {
     return (
@@ -125,15 +127,15 @@ export default function ResortContent() {
       <ResortHeader resort={resort} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> {/* 改为两列布局 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-8">
             <TerrainOverview resort={resort} />
             <ResortDetails resort={resort} weather={weather} />
             <ResortFeatures resort={resort} />
           </div>
           
-          <div className="space-y-8">
-            <WeatherForecast weather={weather} /> {/* 新组件，只显示预报 */}
+          <div>
+            <WeatherForecast weather={weather} />
           </div>
         </div>
       </div>
