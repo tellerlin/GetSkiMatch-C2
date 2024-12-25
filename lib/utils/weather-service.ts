@@ -1,24 +1,17 @@
 const API_BASE_URL = 'https://ski-query-worker.3we.org';
 
+
 export interface WeatherData {
   currentWeather: {
-    temperature: {
-      current: number;
-      feels_like: number;
-    };
-    wind: {
-      speed: number;
-      direction: number;
-      gust: number;
-    };
-    conditions: {
-      main: string;
-      description: string;
-      precipitationProbability: number;
-      snowAmount: number;
-      rainAmount: number;
-    };
-    uvIndex: number;
+    resort_id: string;
+    timestamp: number;
+    temperature: number;
+    feels_like: number;
+    pressure: number;
+    humidity: number;
+    weather_description: string;
+    uv_index: number;
+    wind_gust: number;
     cloudiness: number;
   };
   forecast: Array<{
@@ -53,14 +46,10 @@ const validateWeatherData = (data: any): data is WeatherData => {
 
   // 验证 currentWeather
   const hasValidCurrentWeather = data.currentWeather && 
-    typeof data.currentWeather.temperature === 'object' &&
-    typeof data.currentWeather.temperature.current === 'number' &&
-    typeof data.currentWeather.temperature.feels_like === 'number' &&
-    typeof data.currentWeather.wind === 'object' &&
-    typeof data.currentWeather.wind.speed === 'number' &&
-    typeof data.currentWeather.wind.direction === 'number' &&
-    typeof data.currentWeather.conditions === 'object' &&
-    typeof data.currentWeather.conditions.main === 'string';
+    typeof data.currentWeather.temperature === 'number' &&
+    typeof data.currentWeather.feels_like === 'number' &&
+    typeof data.currentWeather.wind_gust === 'number' &&
+    typeof data.currentWeather.weather_description === 'string';
 
   // 验证 forecast
   const hasValidForecast = Array.isArray(data.forecast) &&

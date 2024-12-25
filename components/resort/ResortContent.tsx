@@ -10,6 +10,7 @@ import WeatherInfo from './WeatherInfo';
 import TerrainOverview from './TerrainOverview';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
+import WeatherForecast from './WeatherForecast';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -31,7 +32,8 @@ export default function ResortContent() {
   const [loading, setLoading] = useState<LoadingState>({ resort: true, weather: true });
   const [error, setError] = useState<ErrorState>({});
 
-  // 修改数据加载逻辑
+
+  // ResortContent.tsx
   useEffect(() => {
     const loadResortData = async () => {
       if (typeof id !== 'string') {
@@ -44,15 +46,20 @@ export default function ResortContent() {
         setError({});
         setLoading({ resort: true, weather: true });
 
-        // 由于天气数据现在包含在 resort 数据中,只需要一次请求
         const resortData = await getResortById(id);
-        console.log('Resort data fetched:', resortData);
+        console.log('Resort data received:', resortData);
 
         if (resortData) {
-          setResort(resortData);
-          // 提取天气数据
+          // 设置度假村数据
+          setResort(resortData.resort); // 注意这里改为 resortData.resort
+
+          // 设置天气数据
           if (resortData.currentWeather && resortData.forecast) {
             setWeather({
+              currentWeather: resortData.currentWeather,
+              forecast: resortData.forecast
+            });
+            console.log('Weather data set:', {
               currentWeather: resortData.currentWeather,
               forecast: resortData.forecast
             });
@@ -74,6 +81,7 @@ export default function ResortContent() {
 
     loadResortData();
   }, [id]);
+
 
   if (loading.resort || loading.weather) {
     return (
@@ -117,19 +125,15 @@ export default function ResortContent() {
       <ResortHeader resort={resort} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> {/* 改为两列布局 */}
+          <div className="space-y-8">
             <TerrainOverview resort={resort} />
             <ResortDetails resort={resort} weather={weather} />
             <ResortFeatures resort={resort} />
           </div>
           
           <div className="space-y-8">
-            <WeatherInfo 
-              weather={weather} 
-              isLoading={loading.weather}
-              error={error.weather}
-            />
+            <WeatherForecast weather={weather} /> {/* 新组件，只显示预报 */}
           </div>
         </div>
       </div>

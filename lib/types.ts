@@ -20,23 +20,15 @@ export interface SkiResort {
 
 export interface WeatherData {
   currentWeather: {
-    temperature: {
-      current: number;
-      feels_like: number;
-    };
-    wind: {
-      speed: number;
-      direction: number;
-      gust: number;
-    };
-    conditions: {
-      main: string;
-      description: string;
-      precipitationProbability: number;
-      snowAmount: number;
-      rainAmount: number;
-    };
-    uvIndex: number;
+    resort_id: string;
+    timestamp: number;
+    temperature: number;
+    feels_like: number;
+    pressure: number;
+    humidity: number;
+    weather_description: string;
+    uv_index: number;
+    wind_gust: number;
     cloudiness: number;
   };
   forecast: Array<{

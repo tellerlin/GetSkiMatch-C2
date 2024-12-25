@@ -11,7 +11,9 @@ import {
   Compass,
   Sun,
   Loader2,
+  Cloud, 
 } from 'lucide-react';
+
 
 interface ResortDetailsProps {
   resort: SkiResort | null;
@@ -152,9 +154,9 @@ const SnowConditions = ({ weather }: SnowConditionsProps) => {
               <span className="text-sm">Temperature</span>
             </div>
             <p className="font-semibold">
-              {currentWeather.temperature.current}°C
+              {currentWeather.temperature}°C
               <span className="text-sm text-gray-500 ml-1">
-                (Feels like {currentWeather.temperature.feels_like}°C)
+                (Feels like {currentWeather.feels_like}°C)
               </span>
             </p>
           </div>
@@ -165,10 +167,7 @@ const SnowConditions = ({ weather }: SnowConditionsProps) => {
               <span className="text-sm">Wind</span>
             </div>
             <p className="font-semibold">
-              {currentWeather.wind.speed} m/s
-              <span className="text-sm text-gray-500 ml-1">
-                ({currentWeather.wind.direction}°)
-              </span>
+              {currentWeather.wind_gust} m/s
             </p>
           </div>
 
@@ -177,16 +176,15 @@ const SnowConditions = ({ weather }: SnowConditionsProps) => {
               <Cloud className="h-4 w-4" />
               <span className="text-sm">Conditions</span>
             </div>
-            <p className="font-semibold">{currentWeather.conditions.main}</p>
-            <p className="text-sm text-gray-500">{currentWeather.conditions.description}</p>
+            <p className="font-semibold">{currentWeather.weather_description}</p>
           </div>
 
           <div>
             <div className="flex items-center space-x-2 text-gray-600">
-              <CloudSnow className="h-4 w-4" />
-              <span className="text-sm">Snow</span>
+              <Sun className="h-4 w-4" />
+              <span className="text-sm">UV Index</span>
             </div>
-            <p className="font-semibold">{currentWeather.conditions.snowAmount}mm</p>
+            <p className="font-semibold">{currentWeather.uv_index}</p>
           </div>
         </div>
       </div>
