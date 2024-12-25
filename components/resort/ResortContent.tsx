@@ -26,7 +26,7 @@ interface ErrorState {
 
 export default function ResortContent() {
   const { id } = useParams();
-  const [resort, setResort] = useState<SkiResort | null>(null);
+  const [resortData, setResortData] = useState<SkiResort | null>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<LoadingState>({ resort: true, weather: true });
   const [error, setError] = useState<ErrorState>({});
@@ -48,22 +48,33 @@ export default function ResortContent() {
 
         if (resortData) {
           // 设置度假村数据，包括elevation信息
-          setResort({
-            ...resortData.resort,
-            elevation: {
-              summit: resortData.resort.elevation?.summit || 2284,
-              base: resortData.resort.elevation?.base || 675
+          setResortData({
+            ...resortData,
+            resort: {
+              ...resortData.resort,
+              elevation: {
+                summit: resortData.resort.elevation?.summit ?? 2284,
+                base: resortData.resort.elevation?.base ?? 675
+              }
             }
           });
 
           // 设置天气数据
           if (resortData.currentWeather && resortData.forecast) {
             setWeather({
-              currentWeather: resortData.currentWeather,
+              currentWeather: {
+                ...resortData.currentWeather,
+                resort_id: resortData.resort.resort_id,
+                timestamp: Date.now()
+              },
               forecast: resortData.forecast
             });
             console.log('Weather data set:', {
-              currentWeather: resortData.currentWeather,
+              currentWeather: {
+                ...resortData.currentWeather,
+                resort_id: resortData.resort.resort_id,
+                timestamp: Date.now()
+              },
               forecast: resortData.forecast
             });
           } else {
@@ -109,7 +120,7 @@ export default function ResortContent() {
     );
   }
 
-  if (!resort) {
+  if (!resortData?.resort) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Alert variant="default" className="max-w-md">
@@ -124,14 +135,14 @@ export default function ResortContent() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <ResortHeader resort={resort} />
+      <ResortHeader resort={resortData?.resort} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-8">
-            <TerrainOverview resort={resort} />
-            <ResortDetails resort={resort} weather={weather} />
-            <ResortFeatures resort={resort} />
+            <TerrainOverview resort={resortData?.resort} />
+            <ResortDetails resort={resortData?.resort} weather={weather} />
+            <ResortFeatures resort={resortData?.resort} />
           </div>
           
           <div>

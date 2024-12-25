@@ -1,27 +1,64 @@
 export interface SkiResort {
-  resort_id: string;
-  name: string;
-  country_code: string;
-  region: string;
-  elevation: {
-    summit: number;
-    base: number;
+  resort: {
+    resort_id: string;
+    name: string;
+    country_code: string;
+    region: string;
+    elevation?: {
+      summit?: number;
+      base?: number;
+    };
+    total_slopes: number;
+    snow_parks: number;
+    night_skiing: number;
+    ski_lifts: number;
+    adult_day_pass: number;
+    currency: string;
+    season_start: string;
+    season_end: string;
+    image_url?: string;
   };
-  total_slopes: number;
-  snow_parks: number;
-  night_skiing: number;
-  ski_lifts: number;
-  adult_day_pass: number;
-  currency: string;
-  season_start: string;
-  season_end: string;
-  image_url?: string;
+  currentWeather?: {
+    resort_id: string;
+    timestamp: number;
+    temperature: number;
+    feels_like: number;
+    pressure: number;
+    humidity: number;
+    weather_description: string;
+    uv_index: number;
+    wind_gust: number;
+    cloudiness: number;
+  };
+  forecast?: Array<{
+    date: string;
+    temperature: {
+      max: number;
+      min: number;
+      feelsLikeDay: number;
+      feelsLikeNight: number;
+    };
+    wind: {
+      speed: number;
+      direction: number;
+      gust: number;
+    };
+    conditions: {
+      main: string;
+      description: string;
+      precipitationProbability: number;
+      snowAmount: number;
+      rainAmount: number;
+    };
+    uvIndex: number;
+    cloudiness: number;
+  }>;
 }
 
 export interface WeatherData {
-  currentWeather: {
-    resort_id: string;
-    timestamp: number;
+  currentWeather?: {
+    resort_id?: string;
+    timestamp?: number;
     temperature: number;
     feels_like: number;
     pressure: number;
