@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -28,15 +28,54 @@ const initialFilters = {
 export default function PreferencesForm() {
   const router = useRouter();
   const [filters, setFilters] = useState(initialFilters);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 优化：使用 useMemo 缓存国家选项列表，避免每次渲染都重新计算
+  const countryOptions = useMemo(
+    () => [
+      { value: 'any', label: 'Any' },
+      { value: 'US', label: 'United States' },
+      { value: 'CA', label: 'Canada' },
+      { value: 'FR', label: 'France' },
+      { value: 'CH', label: 'Switzerland' },
+      { value: 'IT', label: 'Italy' },
+      { value: 'AT', label: 'Austria' },
+      { value: 'JP', label: 'Japan' },
+    ],
+    []
+  );
+
+  // 表单验证函数
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (filters.total_slopes_min > filters.total_slopes_max) {
+      newErrors.total_slopes = 'Minimum slopes cannot be greater than maximum slopes.';
+    }
+
+    if (filters.adult_day_pass_min > filters.adult_day_pass_max) {
+      newErrors.adult_day_pass = 'Minimum price cannot be greater than maximum price.';
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 当 filters 更新时验证表单
+  useEffect(() => {
+    validate();
+  }, [filters]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validate()) return;
 
     const queryParams = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== initialFilters[key as keyof typeof initialFilters]) {
-        // 排除默认值，只有当值与初始值不同时才添加到查询参数中
         if (
           (typeof value === 'number' && !isNaN(value)) ||
           (typeof value === 'string' && value !== '')
@@ -50,7 +89,7 @@ export default function PreferencesForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-label="Preferences Form">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 搜索框 */}
         <div className="md:col-span-2">
@@ -65,6 +104,7 @@ export default function PreferencesForm() {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, name: e.target.value }))
               }
+              aria-label="Search Resorts"
             />
           </div>
         </div>
@@ -78,18 +118,15 @@ export default function PreferencesForm() {
               setFilters((prev) => ({ ...prev, country_code: value }))
             }
           >
-            <SelectTrigger id="country-select">
-              <SelectValue placeholder="Select country" />
+            <SelectTrigger id="country-select" aria-label="Select Country">
+              <SelectValue placeholder="Any" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="any">Any</SelectItem>
-              <SelectItem value="US">United States</SelectItem>
-              <SelectItem value="CA">Canada</SelectItem>
-              <SelectItem value="FR">France</SelectItem>
-              <SelectItem value="CH">Switzerland</SelectItem>
-              <SelectItem value="IT">Italy</SelectItem>
-              <SelectItem value="AT">Austria</SelectItem>
-              <SelectItem value="JP">Japan</SelectItem>
+              {countryOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -106,7 +143,7 @@ export default function PreferencesForm() {
               }))
             }
           >
-            <SelectTrigger id="night-skiing-select">
+            <SelectTrigger id="night-skiing-select" aria-label="Night Skiing">
               <SelectValue placeholder="Any" />
             </SelectTrigger>
             <SelectContent>
@@ -136,11 +173,15 @@ export default function PreferencesForm() {
               }))
             }
             className="mt-2"
+            aria-label="Total Slopes Range"
           />
-          <div className="flex justify-between text-sm text-gray-500">
+          <div className="flex justify-between text-sm text-gray-500 mt-1">
             <span>{filters.total_slopes_min}</span>
             <span>{filters.total_slopes_max}</span>
           </div>
+          {errors.total_slopes && (
+            <p className="text-red-500 text-sm mt-1">{errors.total_slopes}</p>
+          )}
         </div>
 
         {/* 价格范围滑块 */}
@@ -162,15 +203,19 @@ export default function PreferencesForm() {
               }))
             }
             className="mt-2"
+            aria-label="Price Range"
           />
-          <div className="flex justify-between text-sm text-gray-500">
+          <div className="flex justify-between text-sm text-gray-500 mt-1">
             <span>${filters.adult_day_pass_min}</span>
             <span>${filters.adult_day_pass_max}</span>
           </div>
+          {errors.adult_day_pass && (
+            <p className="text-red-500 text-sm mt-1">{errors.adult_day_pass}</p>
+          )}
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-white">
+      <Button type="submit" className="w-full text-white" disabled={Object.keys(errors).length > 0}>
         Find Resorts
       </Button>
     </form>
