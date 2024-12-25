@@ -92,9 +92,17 @@ export async function getWeatherData(resortId: string): Promise<WeatherData | nu
     const data = await response.json();
     
     // 提取天气数据
+    // Transform dates to ensure proper format
+    const transformDates = (forecast: any[]) => {
+      return forecast.map(day => ({
+        ...day,
+        date: new Date(day.date).toISOString()
+      }));
+    };
+
     const weatherData = {
       currentWeather: data.currentWeather,
-      forecast: data.forecast
+      forecast: transformDates(data.forecast)
     };
 
     if (!validateWeatherData(weatherData)) {

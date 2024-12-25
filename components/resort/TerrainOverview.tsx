@@ -1,6 +1,7 @@
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import type { SkiResort } from '@/lib/types';
+// TerrainOverview.tsx
+import { SkiResort } from '@/lib/types';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { use } from 'react';
 
 interface TerrainOverviewProps {
   resort: SkiResort;
@@ -8,50 +9,33 @@ interface TerrainOverviewProps {
 
 export default function TerrainOverview({ resort }: TerrainOverviewProps) {
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Terrain Overview</h2>
-      
-      <div className="space-y-4">
-        <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Beginner</span>
-            <span>{resort.difficulty.beginner}%</span>
+    <Card>
+      <CardHeader>
+        <CardTitle>Terrain Overview</CardTitle>
+        <CardDescription>
+          Overview of the terrain and slopes at {resort.name}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span>Beginner Percentage:</span>
+            <span>{resort.beginner_percentage}%</span>
           </div>
-          <Progress value={resort.difficulty.beginner} className="bg-green-100" />
-        </div>
-
-        <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Intermediate</span>
-            <span>{resort.difficulty.intermediate}%</span>
+          <div className="flex items-center justify-between">
+            <span>Intermediate Percentage:</span>
+            <span>{resort.intermediate_percentage}%</span>
           </div>
-          <Progress value={resort.difficulty.intermediate} className="bg-blue-100" />
-        </div>
-
-        <div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Advanced</span>
-            <span>{resort.difficulty.advanced}%</span>
+          <div className="flex items-center justify-between">
+            <span>Advanced Percentage:</span>
+            <span>{resort.advanced_percentage}%</span>
           </div>
-          <Progress value={resort.difficulty.advanced} className="bg-black/10" />
+          <div className="flex items-center justify-between">
+            <span>Total Slopes:</span>
+            <span>{resort.total_slopes}</span>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 gap-4 text-center">
-        <div className="p-3 bg-gray-50 rounded">
-          <p className="text-2xl font-bold text-blue-600">
-            {resort.features.totalSlopes}
-          </p>
-          <p className="text-sm text-gray-600">Total Slopes</p>
-        </div>
-
-        <div className="p-3 bg-gray-50 rounded">
-          <p className="text-2xl font-bold text-blue-600">
-            {resort.features.skiLifts}
-          </p>
-          <p className="text-sm text-gray-600">Ski Lifts</p>
-        </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }
