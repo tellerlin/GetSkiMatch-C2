@@ -1,4 +1,3 @@
-// ResortDetails.tsx
 import { SkiResort, WeatherData } from '@/lib/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -80,28 +79,14 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
           </div>
         </Card>
 
-        {/* Terrain Distribution */}
+        {/* Facilities */}
         <Card className="p-6">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Mountain className="h-6 w-6 text-blue-600" />
-              <h3 className="text-lg font-semibold">Terrain Distribution</h3>
+              <h3 className="text-lg font-semibold">Facilities</h3>
             </div>
             <div className="grid gap-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Beginner</p>
-                  <p className="font-medium">{resort.beginner_percentage}%</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Intermediate</p>
-                  <p className="font-medium">{resort.intermediate_percentage}%</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Advanced</p>
-                  <p className="font-medium">{resort.advanced_percentage}%</p>
-                </div>
-              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Total Slopes</p>
@@ -163,29 +148,6 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
           </Card>
         )}
       </div>
-
-      {/* Features */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Resort Features</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <Badge 
-              variant={resort.night_skiing ? "default" : "secondary"}
-              className={resort.night_skiing ? "bg-blue-600 hover:bg-blue-700 text-white" : "text-white bg-gray-600 hover:bg-gray-700"}
-            >
-              {resort.night_skiing ? "Night Skiing Available" : "No Night Skiing"}
-            </Badge>
-          </div>
-          <div>
-            <Badge 
-              variant="default"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {resort.snow_parks} Snow Parks
-            </Badge>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

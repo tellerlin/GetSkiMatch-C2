@@ -170,9 +170,6 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                     </p>
                     <div className="text-sm text-gray-500 space-y-1">
                       <p>Feels like {temperature.feelsLikeDay?.toFixed(1) || 'N/A'}°C</p>
-                      <p>Morning: {temperature.morn?.toFixed(1) || 'N/A'}°C</p>
-                      <p>Evening: {temperature.eve?.toFixed(1) || 'N/A'}°C</p>
-                      <p>Night: {temperature.night?.toFixed(1) || 'N/A'}°C</p>
                     </div>
                   </div>
                 </div>
@@ -192,7 +189,6 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                       {wind.gust > (wind.speed || 0) * 1.5 && (
                         <p>Gusts up to {wind.gust?.toFixed(1) || 'N/A'} m/s</p>
                       )}
-                      <p>Pressure: {wind.pressure || 'N/A'}hPa</p>
                     </div>
                   </div>
                 </div>
@@ -218,7 +214,6 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                           Rain: {conditions.rainAmount?.toFixed(1) || 'N/A'}mm
                         </p>
                       )}
-                      <p>Humidity: {conditions.humidity || 'N/A'}%</p>
                     </div>
                   </div>
                 </div>
@@ -233,12 +228,6 @@ export default function WeatherForecast({ weather }: WeatherForecastProps) {
                     <p className="font-medium">
                       UV Index: {day.uvIndex || 'N/A'}
                     </p>
-                    <div className="text-sm text-gray-500 space-y-1">
-                      <p>Cloud Cover: {day.cloudiness || 'N/A'}%</p>
-                      <p>Visibility: {conditions.visibility || 'N/A'}km</p>
-                      <p>Sunrise: {formatDateSafely(conditions.sunrise, 'HH:mm')}</p>
-                      <p>Sunset: {formatDateSafely(conditions.sunset, 'HH:mm')}</p>
-                    </div>
                   </div>
                 </div>
               </div>

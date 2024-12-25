@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { SkiResort, WeatherData } from 'lib/types';
 import ResortHeader from './ResortHeader';
-import TerrainOverview from './TerrainOverview';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
 import WeatherForecast from './WeatherForecast';
@@ -147,7 +146,6 @@ export default function ResortContent({ initialData, params }: ResortContentProp
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-8">
-              <TerrainOverview resort={resortData} />
               <ResortDetails 
                 resort={resortData} 
                 weather={weather}
