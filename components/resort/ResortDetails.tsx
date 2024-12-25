@@ -1,3 +1,4 @@
+// ResortDetails.tsx
 import { SkiResort, WeatherData } from '@/lib/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -128,33 +129,33 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                   <div>
                     <p className="text-sm text-gray-600">Temperature</p>
                     <p className="font-medium">
-                      {weather.currentWeather.temperature.toFixed(1)}°C
+                      {weather.currentWeather?.temperature?.toFixed(1) ?? 'N/A'}°C
                       <span className="block text-sm text-gray-500">
-                        Feels like {weather.currentWeather.feels_like.toFixed(1)}°C
+                        Feels like {weather.currentWeather?.feels_like?.toFixed(1) ?? 'N/A'}°C
                       </span>
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Wind</p>
                     <p className="font-medium">
-                      {weather.currentWeather.wind_gust.toFixed(1)} m/s
+                      {weather.currentWeather?.wind_gust?.toFixed(1) ?? 'N/A'} m/s
                     </p>
                   </div>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Conditions</p>
                   <p className="font-medium capitalize">
-                    {weather.currentWeather.weather_description}
+                    {weather.currentWeather?.weather_description ?? 'N/A'}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Humidity</p>
-                    <p className="font-medium">{weather.currentWeather.humidity}%</p>
+                    <p className="font-medium">{weather.currentWeather?.humidity ?? 'N/A'}%</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">UV Index</p>
-                    <p className="font-medium">{weather.currentWeather.uv_index}</p>
+                    <p className="font-medium">{weather.currentWeather?.uv_index ?? 'N/A'}</p>
                   </div>
                 </div>
               </div>
@@ -170,7 +171,7 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
           <div>
             <Badge 
               variant={resort.night_skiing ? "default" : "secondary"}
-              className={resort.night_skiing ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
+              className={resort.night_skiing ? "bg-blue-600 hover:bg-blue-700 text-white" : "text-white bg-gray-600 hover:bg-gray-700"}
             >
               {resort.night_skiing ? "Night Skiing Available" : "No Night Skiing"}
             </Badge>

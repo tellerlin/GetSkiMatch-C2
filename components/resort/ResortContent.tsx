@@ -1,10 +1,8 @@
+// ResortContent.tsx
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { SkiResort } from '@/lib/types';
-import { getResortById } from '@/lib/utils/resort-service';
-import { getWeatherData, type WeatherData } from '@/lib/utils/weather-service';
+import React, { useState, useEffect } from 'react';
+import { SkiResort, WeatherData } from '@/lib/types';
 import ResortHeader from './ResortHeader';
 import TerrainOverview from './TerrainOverview';
 import ResortFeatures from './ResortFeatures';
@@ -12,6 +10,26 @@ import ResortDetails from './ResortDetails';
 import WeatherForecast from './WeatherForecast';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// 日志初始化
+console.log('ResortContent component loaded');
+
+(() => {
+  console.log('ResortContent immediate test log');
+  console.log('Current environment:', process.env.NODE_ENV);
+})();
+
+// 类型定义
+interface ResortContentProps {
+  initialData: {
+    resort: SkiResort;
+    currentWeather: WeatherData['currentWeather'] | null;
+    forecast: WeatherData['forecast'] | null;
+  };
+  params: {
+    id: string;
+  };
+}
 
 interface LoadingState {
   resort: boolean;
@@ -24,95 +42,97 @@ interface ErrorState {
   general?: string;
 }
 
-export default function ResortContent() {
-  const { id } = useParams();
-  const [resortData, setResortData] = useState<SkiResort | null>(null);
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState<LoadingState>({ resort: true, weather: true });
+// 错误边界组件
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.group('Error Boundary Caught Error');
+    console.error('Error:', error);
+    console.error('Error Info:', errorInfo);
+    console.groupEnd();
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Alert variant="destructive" className="m-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Something went wrong</AlertTitle>
+          <AlertDescription>
+            {this.state.error?.message || 'An unexpected error occurred'}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function ResortContent({ initialData, params }: ResortContentProps) {
+  const [resortData, setResortData] = useState<SkiResort>(initialData.resort);
+  const [weather, setWeather] = useState<WeatherData | null>(
+    initialData.currentWeather && initialData.forecast
+      ? {
+          currentWeather: initialData.currentWeather,
+          forecast: initialData.forecast,
+        }
+      : null
+  );
+  const [loading, setLoading] = useState<LoadingState>({ resort: false, weather: false });
   const [error, setError] = useState<ErrorState>({});
 
   useEffect(() => {
-    const loadResortData = async () => {
-      if (typeof id !== 'string') {
-        setError({ general: 'Invalid resort ID' });
-        setLoading({ resort: false, weather: false });
-        return;
-      }
+    console.log('ResortContent mounted with initial data:', initialData);
 
-      try {
-        setError({});
-        setLoading({ resort: true, weather: true });
+    if (!initialData.resort || !initialData.resort.resort_id || !initialData.resort.name) {
+      console.error('Invalid resort data structure:', initialData.resort);
+      setError({ resort: 'Invalid resort data structure' });
+      return;
+    }
 
-        const resortData = await getResortById(id);
-        console.log('Resort data received:', resortData);
-
-        if (resortData) {
-          // 设置度假村数据，包括elevation信息
-          setResortData({
-            ...resortData,
-            resort: {
-              ...resortData.resort,
-              elevation: {
-                summit: resortData.resort.elevation?.summit ?? 2284,
-                base: resortData.resort.elevation?.base ?? 675
-              }
-            }
-          });
-
-          // 设置天气数据
-          if (resortData.currentWeather && resortData.forecast) {
-            setWeather({
-              currentWeather: {
-                ...resortData.currentWeather,
-                resort_id: resortData.resort.resort_id,
-                timestamp: Date.now()
-              },
-              forecast: resortData.forecast
-            });
-            console.log('Weather data set:', {
-              currentWeather: {
-                ...resortData.currentWeather,
-                resort_id: resortData.resort.resort_id,
-                timestamp: Date.now()
-              },
-              forecast: resortData.forecast
-            });
-          } else {
-            setError(prev => ({ ...prev, weather: 'Weather data unavailable' }));
-          }
-        } else {
-          setError(prev => ({ ...prev, resort: 'Resort not found' }));
-        }
-
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        console.error('Error in loadResortData:', errorMessage);
-        setError(prev => ({ ...prev, general: errorMessage }));
-      } finally {
-        setLoading({ resort: false, weather: false });
-      }
+    performance.mark('resortContentMount');
+    
+    return () => {
+      console.log('ResortContent unmounting');
+      performance.measure('ResortContent Lifetime', 'resortContentMount');
     };
+  }, [initialData]);
 
-    loadResortData();
-  }, [id]);
-
+  // Loading state
   if (loading.resort || loading.weather) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-500">Loading resort information...</p>
+        </div>
       </div>
     );
   }
 
+  // Error state
   if (Object.keys(error).length > 0) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>Error Loading Resort Data</AlertTitle>
           <AlertDescription>
-            {Object.values(error).map((err, index) => (
-              <div key={index}>{err}</div>
+            {Object.entries(error).map(([key, message]) => (
+              <div key={key} className="mt-1">
+                <strong className="capitalize">{key}:</strong> {message}
+              </div>
             ))}
           </AlertDescription>
         </Alert>
@@ -120,36 +140,44 @@ export default function ResortContent() {
     );
   }
 
-  if (!resortData?.resort) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Alert variant="default" className="max-w-md">
-          <AlertTitle>Not Found</AlertTitle>
-          <AlertDescription>
-            The requested resort information could not be found.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <ResortHeader resort={resortData?.resort} />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-8">
-            <TerrainOverview resort={resortData?.resort} />
-            <ResortDetails resort={resortData?.resort} weather={weather} />
-            <ResortFeatures resort={resortData?.resort} />
-          </div>
-          
-          <div>
-            <WeatherForecast weather={weather} />
+    <ErrorBoundary>
+      <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <ResortHeader resort={resortData} />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-8">
+              <TerrainOverview resort={resortData} />
+              <ResortDetails 
+                resort={resortData} 
+                weather={weather}
+              />
+              <ResortFeatures resort={resortData} />
+            </div>
+            
+            <div>
+              {weather ? (
+                <>
+                  <div className="mb-2 text-xs text-gray-400">
+                    Last updated: {new Date(weather.currentWeather.timestamp).toLocaleString()}
+                  </div>
+                  <WeatherForecast weather={weather} />
+                </>
+              ) : (
+                <div className="p-4 bg-yellow-50 rounded-lg">
+                  <p className="text-yellow-700">
+                    Weather data is currently unavailable
+                  </p>
+                  <p className="text-sm text-yellow-600 mt-1">
+                    Please try again later
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </ErrorBoundary>
   );
 }
