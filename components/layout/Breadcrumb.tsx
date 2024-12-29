@@ -2,15 +2,17 @@
 
 import Link from 'next/link';
 import { ChevronRight, Home } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const routeLabels: Record<string, string> = {
   'recommendations': 'Recommendations',
+  'resorts': 'Resorts',
   'ski-resort': 'Resort Details'
 };
 
 export default function Breadcrumb() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const segments = pathname.split('/').filter(Boolean);
   
   return (
@@ -19,7 +21,11 @@ export default function Breadcrumb() {
         <Home className="h-4 w-4" />
       </Link>
       {segments.map((segment, index) => {
-        const path = `/${segments.slice(0, index + 1).join('/')}`;
+        let path = `/${segments.slice(0, index + 1).join('/')}`;
+        if (segment === 'ski-resort' && searchParams) {
+          const countryCode = searchParams.get('country_code');
+          path = `/resorts${countryCode ? `?country_code=${countryCode}` : ''}`;
+        }
         const isLast = index === segments.length - 1;
         const label = routeLabels[segment] || segment;
         
