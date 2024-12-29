@@ -1,6 +1,6 @@
-/** @type {import('next').NextConfig} */
 const path = require('path');
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   eslint: {
@@ -11,7 +11,13 @@ const nextConfig = {
   },
   optimizeFonts: true,
   webpack: (config) => {
-    config.resolve.alias['@'] = path.resolve(__dirname);
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+      '@/lib': path.resolve(__dirname, 'lib'),
+      '@/components': path.resolve(__dirname, 'components'),
+      '@/app': path.resolve(__dirname, 'app')
+    };
     return config;
   },
 };

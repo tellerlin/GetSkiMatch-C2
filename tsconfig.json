@@ -18,14 +18,29 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
+      "@/*": ["./*"],
+      "@/lib/*": ["lib/*"],
+      "@/components/*": ["components/*"],
+      "@/components/ui/*": ["components/ui/*"],
+      "@/components/resort/*": ["components/resort/*"],
+      "@/app/*": ["app/*"],
+      "@/types/*": ["lib/types/*"],
+      "@/utils/*": ["lib/utils/*"],
       "lib/*": ["./lib/*"],
+      "components/*": ["./components/*"],
       "components/ui/*": ["./components/ui/*"],
-      "components/resort/*": ["./components/resort/*"],
-      "@/components/*": ["components/*"]
-    },
-    "baseUrl": "."
+      "components/resort/*": ["./components/resort/*"]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "lib/**/*.ts",
+    "lib/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }
