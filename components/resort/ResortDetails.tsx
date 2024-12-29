@@ -101,6 +101,21 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
           </div>
         </Card>
 
+        {/* Slopes Description */}
+        {resort.slopes_description && (
+          <Card className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Mountain className="h-6 w-6 text-blue-600" />
+                <h3 className="text-lg font-semibold">Slopes Overview</h3>
+              </div>
+              <div className="prose max-w-none">
+                <p className="text-gray-700">{resort.slopes_description}</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Current Weather */}
         {weather && (
           <Card className="p-6">
