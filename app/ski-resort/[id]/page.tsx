@@ -101,9 +101,17 @@ export default async function ResortDetailPage({ params }: PageProps) {
       getWeatherData(params.id) as Promise<WeatherData | null>
     ]);
 
+    console.log('Resort data:', resortData);
+    console.log('Weather data:', weatherData);
+
     if (!resortData) {
-      console.error('Resort not found');
+      console.error('Resort not found for ID:', params.id);
       notFound();
+    }
+
+    if (!resortData.resort_id || !resortData.name) {
+      console.error('Invalid resort data structure:', resortData);
+      throw new Error('Invalid resort data structure');
     }
 
     const completeData = {

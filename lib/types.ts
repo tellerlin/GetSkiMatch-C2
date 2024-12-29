@@ -178,8 +178,4 @@ export interface LoadingState {
 }
 
 // 添加 ErrorState 接口
-export interface ErrorState {
-  resort?: string;
-  weather?: string;
-  general?: string;
-}
+export interface ErrorState extends Record<string, string> {}

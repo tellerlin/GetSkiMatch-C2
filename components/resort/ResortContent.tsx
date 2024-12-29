@@ -6,16 +6,8 @@ import ResortHeader from './ResortHeader';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
 import Weather from './Weather';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from 'components/ui/alert';
-
-// 日志初始化
-console.log('ResortContent component loaded');
-
-(() => {
-  console.log('ResortContent immediate test log');
-  console.log('Current environment:', process.env.NODE_ENV);
-})();
+import LoadingState from 'components/common/LoadingState';
+import ErrorState from 'components/common/ErrorState';
 
 // 类型定义
 interface ResortContentProps {
@@ -34,48 +26,9 @@ interface LoadingState {
   weather: boolean;
 }
 
-interface ErrorState {
-  resort?: string;
-  weather?: string;
-  general?: string;
-}
+interface ErrorState extends Record<string, string> {}
 
-// 错误边界组件
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error: Error | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.group('Error Boundary Caught Error');
-    console.error('Error:', error);
-    console.error('Error Info:', errorInfo);
-    console.groupEnd();
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <Alert variant="destructive" className="m-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Something went wrong</AlertTitle>
-          <AlertDescription>
-            {this.state.error?.message || 'An unexpected error occurred'}
-          </AlertDescription>
-        </Alert>
-      );
-    }
-    return this.props.children;
-  }
-}
+import ErrorBoundary from 'components/common/ErrorBoundary';
 
 export default function ResortContent({ initialData, params }: ResortContentProps) {
   const [resortData, setResortData] = useState<SkiResort>(initialData.resort);
@@ -91,51 +44,53 @@ export default function ResortContent({ initialData, params }: ResortContentProp
   const [error, setError] = useState<ErrorState>({});
 
   useEffect(() => {
-    console.log('ResortContent mounted with initial data:', initialData);
-
-    if (!initialData.resort || !initialData.resort.resort_id || !initialData.resort.name) {
-      console.error('Invalid resort data structure:', initialData.resort);
-      setError({ resort: 'Invalid resort data structure' });
-      return;
-    }
-
-    performance.mark('resortContentMount');
-  
-    return () => {
-      console.log('ResortContent unmounting');
-      performance.measure('ResortContent Lifetime', 'resortContentMount');
+    const fetchResortData = async () => {
+      try {
+        setLoading(prev => ({ ...prev, resort: true }));
+        
+        // If initial data is invalid, fetch fresh data
+        if (!initialData.resort || !initialData.resort.resort_id || !initialData.resort.name) {
+          const response = await fetch(`/api/resorts/${params.id}`);
+          if (!response.ok) throw new Error('Failed to fetch resort data');
+          
+          const data = await response.json();
+          setResortData(data.resort);
+          if (data.weather) {
+            setWeather({
+              currentWeather: data.weather.current,
+              forecast: data.weather.forecast
+            });
+          }
+        } else {
+          setResortData(initialData.resort);
+          if (initialData.currentWeather && initialData.forecast) {
+            setWeather({
+              currentWeather: initialData.currentWeather,
+              forecast: initialData.forecast
+            });
+          }
+        }
+      } catch (error) {
+        setError({
+          resort: 'Failed to load resort data',
+          general: error instanceof Error ? error.message : 'Unknown error occurred'
+        });
+      } finally {
+        setLoading(prev => ({ ...prev, resort: false }));
+      }
     };
-  }, [initialData]);
+
+    fetchResortData();
+  }, [initialData, params.id]);
 
   // Loading state
   if (loading.resort || loading.weather) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-500">Loading resort information...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Loading resort information..." />;
   }
 
   // Error state
   if (Object.keys(error).length > 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error Loading Resort Data</AlertTitle>
-          <AlertDescription>
-            {Object.entries(error).map(([key, message]) => (
-              <div key={key} className="mt-1">
-                <strong className="capitalize">{key}:</strong> {message}
-              </div>
-            ))}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+    return <ErrorState errors={error} title="Error Loading Resort Data" />;
   }
 
   return (

@@ -4,23 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from 'components/ui/card';
 import { Badge } from 'components/ui/badge';
-import { Snowflake, Mountain, DollarSign, Moon, CableCar } from 'lucide-react';
+import ResortInfoGrid from './ResortInfoGrid';
+import NightSkiingBadge from './NightSkiingBadge';
 import { memo } from 'react';
 import { imageLoader } from 'lib/utils/image-loader';
 
-interface SkiResort {
-  resort_id: string;
-  name: string;
-  country_code: string;
-  region?: string;
-  total_slopes: number;
-  snow_parks?: number;
-  ski_lifts?: number;
-  adult_day_pass: number;
-  currency?: string;
-  night_skiing: 0 | 1;
-  image_url?: string;
-}
+import type { SkiResort } from 'lib/types';
 
 interface ResortCardProps {
   resort: SkiResort;
@@ -67,64 +56,10 @@ const ResortCard = memo(function ResortCard({ resort, className }: ResortCardPro
 
           {/* Info Grid */}
           <div className="flex-grow">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-              {/* Slopes */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <Snowflake className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-500">Slopes:</span>
-                </div>
-                <span className="text-sm font-medium pl-7">
-                  {resort.total_slopes || 'N/A'}
-                </span>
-              </div>
-
-              {/* Parks */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <Mountain className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-500">Parks:</span>
-                </div>
-                <span className="text-sm font-medium pl-7">
-                  {resort.snow_parks !== undefined ? resort.snow_parks : 'N/A'}
-                </span>
-              </div>
-
-              {/* Lifts */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <CableCar className="h-5 w-5 text-red-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-500">Lifts:</span>
-                </div>
-                <span className="text-sm font-medium pl-7">
-                  {resort.ski_lifts !== undefined ? resort.ski_lifts : 'N/A'}
-                </span>
-              </div>
-
-              {/* Price */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-500">Price:</span>
-                </div>
-                <span className="text-sm font-medium pl-7">{formattedPrice}</span>
-              </div>
-            </div>
+            <ResortInfoGrid resort={resort} />
 
             {/* Night Skiing Badge */}
-            {resort.night_skiing === 1 && (
-              <div className="mt-4">
-                <div className="flex items-center gap-2">
-                  <Moon className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <Badge 
-                    variant="secondary" 
-                    className="bg-purple-100 text-purple-800 font-medium"
-                  >
-                    Night Skiing Available
-                  </Badge>
-                </div>
-              </div>
-            )}
+            {resort.night_skiing === 1 && <NightSkiingBadge className="mt-4" />}
           </div>
 
           {/* Button Section */}
