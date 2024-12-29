@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { imageLoader } from '@/lib/utils/image-loader';
-import { FadeIn } from '@/components/ui/animations';
-import { SkiResort } from '@/lib/types';
+import { imageLoader } from '../../lib/utils/image-loader';
+import { FadeIn } from '../../components/ui/animations';
+import { SkiResort } from '../../lib/types/index';
 
 interface ResponsiveResortCardProps {
   resort: SkiResort;
@@ -34,18 +34,6 @@ export default function ResponsiveResortCard({ resort }: ResponsiveResortCardPro
           <h3 className="text-xl font-semibold mb-2 line-clamp-2">
             {resort.name}
           </h3>
-          
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="difficulty-badge difficulty-badge-beginner">
-              {resort.beginner_percentage}% Beginner
-            </span>
-            <span className="difficulty-badge difficulty-badge-intermediate">
-              {resort.intermediate_percentage}% Intermediate
-            </span>
-            <span className="difficulty-badge difficulty-badge-advanced">
-              {resort.advanced_percentage}% Advanced
-            </span>
-          </div>
           
           <div className="space-y-2">
             <p className="text-sm text-gray-600">

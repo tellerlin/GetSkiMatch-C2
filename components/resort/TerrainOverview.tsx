@@ -1,7 +1,5 @@
-// TerrainOverview.tsx
-import { SkiResort } from '@/lib/types';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { use } from 'react';
+import { SkiResort } from '../../lib/types/index';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../../components/ui/card';
 
 interface TerrainOverviewProps {
   resort: SkiResort;
@@ -18,18 +16,6 @@ export default function TerrainOverview({ resort }: TerrainOverviewProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span>Beginner Percentage:</span>
-            <span>{resort.beginner_percentage}%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Intermediate Percentage:</span>
-            <span>{resort.intermediate_percentage}%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Advanced Percentage:</span>
-            <span>{resort.advanced_percentage}%</span>
-          </div>
           <div className="flex items-center justify-between">
             <span>Total Slopes:</span>
             <span>{resort.total_slopes}</span>

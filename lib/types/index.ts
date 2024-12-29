@@ -20,23 +20,15 @@ export interface SkiResort {
   region: string;
   latitude: number;
   longitude: number;
-  beginner_percentage: number;
-  intermediate_percentage: number;
-  advanced_percentage: number;
   total_slopes: number;
   snow_parks: number;
-  night_skiing: number;
+  night_skiing: 0 | 1;
   ski_lifts: number;
   adult_day_pass: number;
   currency: string;
   season_start: string;
   season_end: string;
   image_url?: string;
-  difficulty?: {
-    beginner: number;
-    intermediate: number;
-    advanced: number;
-  };
   pricing?: {
     adultDayPass: number;
   };
@@ -88,6 +80,11 @@ export interface PaginationInfo {
   page: number;
   limit: number;
   total_pages: number;
+}
+
+export interface CountryInfo {
+  country_code: string;
+  weather_agency?: string;
 }
 
 export interface ResortFilters {

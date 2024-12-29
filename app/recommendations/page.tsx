@@ -3,7 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SkiResort, UserPreferences } from 'lib/types/index';
-import { calculateMatchScore } from 'lib/utils/recommendations';
 import resortService from 'lib/utils/resort-service';
 import { getWeatherData } from 'lib/utils/weather-service';
 import ResortCard from 'components/resort/ResortCard/index';
@@ -12,7 +11,7 @@ import { Card } from 'components/ui/card';
 
 export default function RecommendationsPage() {
   const searchParams = useSearchParams();
-  const [recommendations, setRecommendations] = useState<Array<SkiResort & { matchScore: number }>>([]);
+  const [recommendations, setRecommendations] = useState<Array<SkiResort>>([]);
   const [weatherData, setWeatherData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
@@ -23,34 +22,26 @@ export default function RecommendationsPage() {
         if (preferencesParam) {
           const preferences: UserPreferences = JSON.parse(preferencesParam);
           const rawResults = await resortService.getRecommendations(preferences);
-          const results = rawResults.map(resort => {
-            const resortWithNewProps = {
-              ...resort,
-              difficulty: {
-                beginner: resort.beginner_percentage,
-                intermediate: resort.intermediate_percentage,
-                advanced: resort.advanced_percentage
-              },
-              pricing: {
-                adultDayPass: resort.adult_day_pass
-              },
-              features: {
-                snowParks: resort.snow_parks
-              }
-            };
-            
-            return {
-              ...resortWithNewProps,
-              matchScore: calculateMatchScore(resortWithNewProps, preferences)
-            };
-          });
+          const results = rawResults.map((resort: SkiResort) => ({
+            ...resort,
+            pricing: {
+              adultDayPass: resort.adult_day_pass
+            },
+            features: {
+              snowParks: resort.snow_parks
+            }
+          }));
           
           // Fetch weather data for all resorts
-          const weatherPromises = results.map(resort => getWeatherData(resort.resort_id));
-          const weatherResults = await Promise.all(weatherPromises);
+          const weatherPromises = results.map((resort: SkiResort) => getWeatherData(resort.resort_id));
+          const weatherResults = await Promise.all<{ temperature: number; weather_description: string }>(weatherPromises);
           
-          const weatherMap = results.reduce<Record<string, any>>((acc: Record<string, any>, resort: SkiResort, index: number) => {
-            acc[resort.resort_id] = weatherResults[index];
+          type WeatherData = { temperature: number; weather_description: string };
+          const weatherMap = results.reduce((acc: Record<string, WeatherData>, resort: SkiResort & { matchScore: number }, index: number) => {
+            acc[resort.resort_id] = {
+              temperature: weatherResults[index].temperature,
+              weather_description: weatherResults[index].weather_description
+            };
             return acc;
           }, {});
           

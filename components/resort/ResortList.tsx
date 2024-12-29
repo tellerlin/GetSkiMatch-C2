@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ResortCard from './ResortCard';
-import { SkiResort } from '@/lib/types';
+import { SkiResort } from '../../lib/types/index';
 import { Loader2 } from 'lucide-react';
 import Pagination from '../filters/Pagination';
 
@@ -43,18 +43,24 @@ export default function ResortList() {
         if (data.resorts && Array.isArray(data.resorts)) {
           // 获取每个滑雪场的详细信息
           const detailedResorts = await Promise.all(
-            data.resorts.map(async (resort: SkiResort) => {
+            data.resorts.map(async (resort: any) => {
               try {
                 const detailResponse = await fetch(`https://ski-query-worker.3we.org/resort?id=${resort.resort_id}`);
                 const detailData = await detailResponse.json();
                 console.log('Detail Response for', resort.resort_id, ':', detailData); // 添加日志
                 
-                return {
+                // Convert night_skiing to 0 | 1
+                const nightSkiing = resort.night_skiing ? 1 : 0;
+                
+                const convertedResort = {
                   ...resort,
+                  night_skiing: nightSkiing,
                   slopes_description: detailData.resort?.slopes_description,
                   weather_agency: detailData.resort?.weather_agency,
                   currentWeather: detailData.currentWeather
                 };
+
+                return convertedResort;
               } catch (error) {
                 console.error('Error fetching resort details:', error);
                 return resort;

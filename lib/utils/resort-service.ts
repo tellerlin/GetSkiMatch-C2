@@ -1,4 +1,4 @@
-import { SkiResort, ResortFilters, UserPreferences } from '../types';
+import { SkiResort, ResortFilters, UserPreferences, CountryInfo } from '../types/index';
 
 const API_BASE_URL = 'https://ski-query-worker.3we.org';
 
@@ -56,7 +56,7 @@ export async function getFilteredResorts(filters: ResortFilters = {}) {
       resortsResponse.json()
     ]);
 
-    const countriesMap = new Map(countriesData.map((c: any) => [c.country_code, c]));
+    const countriesMap = new Map(countriesData.map((c: CountryInfo) => [c.country_code, c]));
 
     if (!resortsResponse.ok) {
       throw new Error(`HTTP error! status: ${resortsResponse.status}`);
@@ -73,8 +73,9 @@ export async function getFilteredResorts(filters: ResortFilters = {}) {
 
         return {
           ...resort,
-          weather_agency: countryInfo?.weather_agency,
-          slopes_description: detailData.resort?.slopes_description,
+          night_skiing: resort.night_skiing ? 1 : 0,
+          weather_agency: (countryInfo as CountryInfo)?.weather_agency,
+          slopes_description: (detailData.resort as { slopes_description?: string })?.slopes_description,
           currentWeather: detailData.currentWeather
         };
       });
@@ -121,8 +122,12 @@ export async function getResortById(id: string): Promise<SkiResort | null> {
       return null;
     }
 
-    setCachedData(cacheKey, data.resort);
-    return data.resort;
+    const validatedResort = {
+      ...data.resort,
+      night_skiing: data.resort.night_skiing ? 1 : 0
+    };
+    setCachedData(cacheKey, validatedResort);
+    return validatedResort;
   } catch (error) {
     return null;
   }
@@ -150,8 +155,83 @@ export async function getCountries() {
   }
 }
 
+export async function getRecommendations(preferences: UserPreferences) {
+  const queryParams = new URLSearchParams();
+  
+  // Convert preferences to query parameters
+  if (preferences.skillLevel) {
+    queryParams.append('skill_level', preferences.skillLevel);
+  }
+  if (preferences.preferredTerrain?.length) {
+    preferences.preferredTerrain.forEach((terrain: string) => 
+      queryParams.append('terrain', terrain)
+    );
+  }
+  if (preferences.maxPrice) {
+    queryParams.append('max_price', preferences.maxPrice.toString());
+  }
+  if (preferences.nightSkiing) {
+    queryParams.append('night_skiing', '1');
+  }
+  if (preferences.snowParks) {
+    queryParams.append('snow_parks', '1');
+  }
+  if (preferences.minSlopes) {
+    queryParams.append('min_slopes', preferences.minSlopes.toString());
+  }
+  if (preferences.minLifts) {
+    queryParams.append('min_lifts', preferences.minLifts.toString());
+  }
+  if (preferences.budgetRange) {
+    queryParams.append('min_price', preferences.budgetRange.min.toString());
+    queryParams.append('max_price', preferences.budgetRange.max.toString());
+  }
+  if (preferences.terrainPreferences?.length) {
+    preferences.terrainPreferences.forEach((terrain: 'groomed' | 'powder' | 'park' | 'backcountry') => 
+      queryParams.append('terrain_preference', terrain)
+    );
+  }
+
+  const cacheKey = `recommendations:${queryParams.toString()}`;
+  const cachedData = getCachedData(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/recommendations?${queryParams.toString()}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    if (data.resorts && Array.isArray(data.resorts)) {
+      // Batch fetch detailed information for each resort
+      const resortIds = data.resorts.map((r: SkiResort) => r.resort_id);
+      const detailsData = await batchFetchResortDetails(resortIds);
+
+      const enhancedResorts = data.resorts.map((resort: SkiResort, index: number) => ({
+        ...resort,
+        night_skiing: resort.night_skiing ? 1 : 0,
+        ...detailsData[index].resort,
+        currentWeather: detailsData[index].currentWeather
+      }));
+
+      setCachedData(cacheKey, enhancedResorts);
+      return enhancedResorts;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching recommendations:', error);
+    return [];
+  }
+}
+
 export default {
   getFilteredResorts,
   getResortById,
-  getCountries
+  getCountries,
+  getRecommendations
 };

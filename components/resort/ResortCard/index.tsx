@@ -7,33 +7,19 @@ import { Badge } from 'components/ui/badge';
 import { memo, useState } from 'react';
 import { Thermometer, CloudSnow, Mountain, DollarSign, Moon, CableCar } from 'lucide-react';
 
-interface SkiResort {
-  resort_id: string;
-  name: string;
-  country_code: string;
-  region?: string;
-  total_slopes: number;
-  snow_parks?: number;
-  ski_lifts?: number;
-  adult_day_pass: number;
-  currency?: string;
-  night_skiing: number;
-  image_url?: string;
-  slopes_description?: string;
-  season_start?: string;
-  season_end?: string;
-  weather_agency?: string;
-  currentWeather?: {
-    temperature: number;
-    weather_description: string;
-  };
+import { SkiResort } from 'lib/types';
+
+interface WeatherData {
+  temperature: number;
+  weather_description: string;
 }
 
 interface ResortCardProps {
   resort: SkiResort;
+  weather?: WeatherData;
 }
 
-const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
+const ResortCard = memo(function ResortCard({ resort, weather }: ResortCardProps) {
   const [imageError, setImageError] = useState(false);
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -65,14 +51,14 @@ const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
             {resort.region ? `${resort.region}, ` : ''}
             {resort.country_code}
           </p>
-          {resort.currentWeather && (
+          {(weather || resort.currentWeather) && (
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Thermometer className="h-4 w-4" />
-                {Math.round(resort.currentWeather.temperature)}°C
+                {Math.round((weather?.temperature || resort.currentWeather?.temperature) as number)}°C
               </Badge>
               <Badge variant="secondary" className="capitalize">
-                {resort.currentWeather.weather_description}
+                {weather?.weather_description || resort.currentWeather?.weather_description}
               </Badge>
             </div>
           )}
