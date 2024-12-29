@@ -17,16 +17,49 @@ export async function getFilteredResorts(filters: ResortFilters = {}) {
   });
 
   try {
-    const response = await fetch(`${API_BASE_URL}/resorts?${queryParams.toString()}`);
-    const data = await response.json();
+    // Get countries data for weather agency information
+    const countriesResponse = await fetch(`${API_BASE_URL}/countries`);
+    const countriesData = await countriesResponse.json();
+    const countriesMap = new Map(countriesData.map((c: any) => [c.country_code, c]));
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Get resorts data
+    const resortsResponse = await fetch(`${API_BASE_URL}/resorts?${queryParams.toString()}`);
+    const resortsData = await resortsResponse.json();
+
+    if (!resortsResponse.ok) {
+      throw new Error(`HTTP error! status: ${resortsResponse.status}`);
     }
 
+    // Enhance resorts with additional data
+    const enhancedResorts = await Promise.all(
+      resortsData.resorts.map(async (resort: any) => {
+        // Get weather data
+        const weatherResponse = await fetch(`${API_BASE_URL}/resort?id=${resort.resort_id}`);
+        const weatherData = await weatherResponse.json();
+        
+        // Get country info
+        const countryInfo = countriesMap.get(resort.country_code);
+
+        console.log('Original resort data:', resort);
+        console.log('Weather data:', weatherData);
+        
+        const enhancedResort = {
+          ...resort,
+          weather_agency: countryInfo?.weather_agency,
+          currentWeather: weatherData.currentWeather ? {
+            temperature: weatherData.currentWeather.temperature,
+            weather_description: weatherData.currentWeather.weather_description
+          } : undefined
+        };
+        
+        console.log('Enhanced resort data:', enhancedResort);
+        return enhancedResort;
+      })
+    );
+
     return {
-      resorts: data.resorts || [],
-      pagination: data.pagination || {
+      resorts: enhancedResorts || [],
+      pagination: resortsData.pagination || {
         total: 0,
         page: 1,
         limit: 20,

@@ -31,11 +31,6 @@ export interface SkiResort {
   season_start: string; // 滑雪季开始日期（ISO 格式）
   season_end: string;   // 滑雪季结束日期（ISO 格式）
 
-  // 雪道级别百分比
-  beginner_percentage: number;     // 初级雪道百分比
-  intermediate_percentage: number; // 中级雪道百分比
-  advanced_percentage: number;     // 高级雪道百分比
-
   // 图片 URL（可选）
   image_url?: string;
 
@@ -44,6 +39,12 @@ export interface SkiResort {
 
   // 天气预报信息（可选）
   forecast?: Forecast[];
+
+  // 天气机构信息
+  weather_agency?: string;
+
+  // 雪道描述
+  slopes_description?: string;
 }
 
 // 当前天气接口
@@ -58,6 +59,8 @@ export interface CurrentWeather {
   uv_index: number;              // 紫外线指数
   wind_gust: number;             // 阵风速度（km/h 或 mph）
   cloudiness: number;            // 云量（%）
+  wind_speed?: number;           // 风速
+  wind_deg?: number;             // 风向
 }
 
 // 天气预报接口
