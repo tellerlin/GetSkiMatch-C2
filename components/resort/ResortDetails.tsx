@@ -12,7 +12,8 @@ import {
   Cloud,
   MapPin,
   Calendar,
-  DollarSign
+  DollarSign,
+  ArrowDownNarrowWide
 } from 'lucide-react';
 
 interface ResortDetailsProps {
@@ -30,7 +31,24 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold tracking-tight">Resort Details</h2>
+      <div className="w-full bg-gray-50 p-6 rounded-lg">
+        {resort.image_url && (
+          <img 
+            src={resort.image_url}
+            alt={resort.name}
+            className="w-full h-64 object-cover rounded-lg mb-6"
+          />
+        )}
+        <div className="flex items-center space-x-2 mb-4">
+          <ArrowDownNarrowWide className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold tracking-tight">Resort Details</h2>
+        </div>
+        {resort.slopes_description && (
+          <div className="prose max-w-none">
+            <p className="text-gray-700">{resort.slopes_description}</p>
+          </div>
+        )}
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Location Info */}
@@ -96,25 +114,21 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                   <p className="text-sm text-gray-600">Ski Lifts</p>
                   <p className="font-medium">{resort.ski_lifts}</p>
                 </div>
+                <div>
+                  <p className="text-sm text-gray-600">Snow Parks</p>
+                  <p className="font-medium">{resort.snow_parks}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Night Skiing</p>
+                  <p className="font-medium">
+                    {resort.night_skiing ? 'Available' : 'Not Available'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Slopes Description */}
-        {resort.slopes_description && (
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Mountain className="h-6 w-6 text-blue-600" />
-                <h3 className="text-lg font-semibold">Slopes Overview</h3>
-              </div>
-              <div className="prose max-w-none">
-                <p className="text-gray-700">{resort.slopes_description}</p>
-              </div>
-            </div>
-          </Card>
-        )}
 
         {/* Current Weather */}
         {weather && (
@@ -156,6 +170,10 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                   <div>
                     <p className="text-sm text-gray-600">UV Index</p>
                     <p className="font-medium">{weather.currentWeather?.uv_index ?? 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Cloudiness</p>
+                    <p className="font-medium">{weather.currentWeather?.cloudiness ?? 'N/A'}%</p>
                   </div>
                 </div>
               </div>
