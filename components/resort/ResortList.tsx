@@ -108,10 +108,7 @@ export default function ResortList() {
 
       {pagination.total_pages > 1 && (
         <Pagination 
-          pagination={{
-            page: pagination.page,
-            total_pages: pagination.total_pages
-          }}
+          pagination={pagination}
           onPageChange={(page) => {
             const params = new URLSearchParams(searchParams?.toString() || '');
             params.set('page', page.toString());

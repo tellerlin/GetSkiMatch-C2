@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Card } from '@/components/ui/card';
+import { Card } from 'components/ui/card';
 import { memo } from 'react';
 import ResortImage from './ResortImage';
 import ResortInfo from './ResortInfo';
@@ -17,15 +17,16 @@ interface SkiResort {
   ski_lifts?: number;
   adult_day_pass: number;
   currency?: string;
-  night_skiing: 0 | 1;
+  night_skiing: number;
   image_url?: string;
 }
 
 interface ResortCardProps {
   resort: SkiResort;
+  weather?: any;
 }
 
-const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
+const ResortCard = memo(function ResortCard({ resort, weather }: ResortCardProps) {
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: resort.currency || 'USD',
@@ -33,7 +34,7 @@ const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 focus-within:ring-2 focus-within:ring-blue-400 h-full flex flex-col">
-      <ResortImage imageUrl={resort.image_url} name={resort.name} />
+      <ResortImage imageUrl={resort.image_url || ''} name={resort.name} />
 
       <div className="p-6 flex flex-col flex-grow">
         <div className="h-[76px]">
@@ -54,6 +55,7 @@ const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
             snowParks={resort.snow_parks}
             skiLifts={resort.ski_lifts}
             price={formattedPrice}
+            weather={weather}
           />
 
           {resort.night_skiing === 1 && (

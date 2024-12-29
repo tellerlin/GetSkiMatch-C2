@@ -52,11 +52,11 @@ export default function WeatherInfo({ weather }: WeatherInfoProps) {
           <div className="space-y-2">
             {forecast.slice(0, 8).map((day, index) => (
               <div key={index} className="flex justify-between items-center text-sm">
-                <span>{new Date(day.forecast_date).toLocaleDateString()}</span>
+                <span>{new Date(day.date).toLocaleDateString()}</span>
                 <div className="text-right">
-                  <span className="text-blue-600">{day.temperature_min}°</span>
+                  <span className="text-blue-600">{day.temperature.min}°</span>
                   {' - '}
-                  <span className="text-red-600">{day.temperature_max}°</span>
+                  <span className="text-red-600">{day.temperature.max}°</span>
                 </div>
               </div>
             ))}

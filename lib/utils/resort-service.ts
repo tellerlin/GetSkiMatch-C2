@@ -1,4 +1,5 @@
 import { SkiResort, ResortFilters } from '../types';
+import { UserPreferences } from '../types/index';
 
 const API_BASE_URL = 'https://ski-query-worker.3we.org';
 
@@ -7,7 +8,11 @@ export async function getFilteredResorts(filters: ResortFilters = {}) {
   
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {
-      queryParams.append(key, value.toString());
+      if (Array.isArray(value)) {
+        value.forEach(v => queryParams.append(key, v));
+      } else {
+        queryParams.append(key, value.toString());
+      }
     }
   });
 
@@ -71,8 +76,32 @@ export async function getCountries() {
   }
 }
 
+export async function getRecommendations(preferences: UserPreferences): Promise<SkiResort[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/recommendations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(preferences)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return data.resorts || [];
+  } catch (error) {
+    console.error('Error getting recommendations:', error);
+    return [];
+  }
+}
+
 export default {
   getFilteredResorts,
   getResortById,
-  getCountries
+  getCountries,
+  getRecommendations
 };

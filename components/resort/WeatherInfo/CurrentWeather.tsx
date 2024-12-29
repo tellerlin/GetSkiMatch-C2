@@ -1,6 +1,6 @@
 import { WeatherData } from '@/lib/types';
 import WeatherMetric from './WeatherMetric';
-import { Thermometer, Wind, CloudSun } from 'lucide-react';
+import { Thermometer, Wind, CloudSun, Cloud } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface CurrentWeatherProps {
@@ -8,6 +8,15 @@ interface CurrentWeatherProps {
 }
 
 export default function CurrentWeather({ weather }: CurrentWeatherProps) {
+  if (!weather.currentWeather) {
+    return (
+      <div className="text-center text-gray-500 py-6">
+        <Cloud className="h-8 w-8 mx-auto mb-2" />
+        <p>Current weather data is unavailable</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-4">

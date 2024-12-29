@@ -76,56 +76,53 @@ const WeatherInfo = memo(({ weather, isLoading, error }: WeatherInfoProps) => {
     return { label: 'Fair', color: 'bg-gray-500' };
   };
 
-  const CurrentWeatherSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="space-y-4">
-        <WeatherMetric
-          icon={<Thermometer className="h-5 w-5 text-blue-600" />}
-          label="Temperature"
-          value={`${formatTemperature(weather.currentWeather.temperature.current)}°C`}
-          subValue={`Feels like ${formatTemperature(weather.currentWeather.temperature.feels_like)}°C`}
-        />
-        <WeatherMetric
-          icon={<Wind className="h-5 w-5 text-blue-600" />}
-          label="Wind"
-          value={`${weather.currentWeather.wind.speed} m/s`}
-          subValue={`Gusts up to ${weather.currentWeather.wind.gust} m/s`}
-        />
-        <WeatherMetric
-          icon={<CloudSun className="h-5 w-5 text-blue-600" />}
-          label="Cloudiness"
-          value={`${weather.currentWeather.cloudiness}%`}
-        />
-      </div>
+  const CurrentWeatherSection = () => {
+    if (!weather.currentWeather) {
+      return (
+        <div className="text-center text-gray-500 py-6">
+          <Cloud className="h-8 w-8 mx-auto mb-2" />
+          <p>Current weather data is unavailable</p>
+        </div>
+      );
+    }
 
-      <div className="space-y-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
-          <div className="space-y-2">
-            <Badge className="mr-2">
-              {weather.currentWeather.conditions.main}
-            </Badge>
-            {weather.currentWeather.conditions.snowAmount > 0 && (
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <WeatherMetric
+            icon={<Thermometer className="h-5 w-5 text-blue-600" />}
+            label="Temperature"
+            value={`${formatTemperature(weather.currentWeather.temperature)}°C`}
+            subValue={`Feels like ${formatTemperature(weather.currentWeather.feels_like)}°C`}
+          />
+          <WeatherMetric
+            icon={<Wind className="h-5 w-5 text-blue-600" />}
+            label="Wind Gust"
+            value={`${weather.currentWeather.wind_gust} m/s`}
+          />
+          <WeatherMetric
+            icon={<CloudSun className="h-5 w-5 text-blue-600" />}
+            label="Cloudiness"
+            value={`${weather.currentWeather.cloudiness}%`}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
+            <div className="space-y-2">
               <Badge className="mr-2">
-                Fresh Snow {weather.currentWeather.conditions.snowAmount}mm
+                {weather.currentWeather.weather_description}
               </Badge>
-            )}
-            {weather.currentWeather.conditions.precipitationProbability > 0 && (
-              <Badge className="mr-2">
-                Precipitation {weather.currentWeather.conditions.precipitationProbability}%
-              </Badge>
-            )}
-            {weather.currentWeather.wind.speed > 15 && (
-              <Badge variant="destructive">Strong Winds</Badge>
-            )}
+              {weather.currentWeather.wind_gust > 15 && (
+                <Badge variant="destructive">Strong Winds</Badge>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-blue-700 mt-2">
-            {weather.currentWeather.conditions.description}
-          </p>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const ForecastSection = () => (
     <div className="space-y-6">

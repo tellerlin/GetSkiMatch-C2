@@ -1,4 +1,4 @@
-import { SkiResort, UserPreferences } from '../types';
+import { SkiResort, UserPreferences } from '../types/index';
 
 export function calculateMatchScore(resort: SkiResort, preferences: UserPreferences): number {
   const skillLevelMatch = calculateSkillLevelMatch(resort, preferences.skillLevel);
@@ -9,7 +9,11 @@ export function calculateMatchScore(resort: SkiResort, preferences: UserPreferen
 }
 
 function calculateSkillLevelMatch(resort: SkiResort, skillLevel: UserPreferences['skillLevel']): number {
-  const difficultyDistribution = resort.difficulty;
+  const difficultyDistribution = {
+    beginner: resort.beginner_percentage,
+    intermediate: resort.intermediate_percentage,
+    advanced: resort.advanced_percentage
+  };
   
   switch (skillLevel) {
     case 'beginner':
@@ -24,7 +28,7 @@ function calculateSkillLevelMatch(resort: SkiResort, skillLevel: UserPreferences
 }
 
 function calculateBudgetMatch(resort: SkiResort, budgetRange: UserPreferences['budgetRange']): number {
-  const price = resort.pricing.adultDayPass;
+  const price = resort.adult_day_pass;
   
   if (price <= budgetRange.min) return 0.8;
   if (price > budgetRange.max) return 0;
@@ -36,19 +40,19 @@ function calculateBudgetMatch(resort: SkiResort, budgetRange: UserPreferences['b
 function calculateTerrainMatch(resort: SkiResort, preferences: UserPreferences['terrainPreferences']): number {
   let match = 0;
   
-  preferences.forEach(pref => {
+  preferences.forEach((pref: 'groomed' | 'powder' | 'park' | 'backcountry') => {
     switch (pref) {
       case 'groomed':
-        match += resort.difficulty.beginner + resort.difficulty.intermediate > 60 ? 1 : 0.5;
+        match += resort.beginner_percentage + resort.intermediate_percentage > 60 ? 1 : 0.5;
         break;
       case 'powder':
-        match += resort.difficulty.advanced > 20 ? 1 : 0.5;
+        match += resort.advanced_percentage > 20 ? 1 : 0.5;
         break;
       case 'park':
-        match += resort.features.snowParks >= 3 ? 1 : 0.5;
+        match += resort.snow_parks >= 3 ? 1 : 0.5;
         break;
       case 'backcountry':
-        match += resort.difficulty.advanced > 25 ? 1 : 0.5;
+        match += resort.advanced_percentage > 25 ? 1 : 0.5;
         break;
     }
   });

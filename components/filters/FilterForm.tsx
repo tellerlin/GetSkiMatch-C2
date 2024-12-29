@@ -2,20 +2,21 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import { Card } from 'components/ui/card';
+import { Input } from 'components/ui/input';
+import { Label } from 'components/ui/label';
+import { Button } from 'components/ui/button';
+import { Slider } from 'components/ui/slider';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ResortFilters, Country } from '@/lib/types';
-import { Badge } from '@/components/ui/badge';
+} from 'components/ui/select';
+import { ResortFilters } from 'lib/types/filters';
+import { Country } from 'lib/types/filters';
+import { Badge } from 'components/ui/badge';
 import { X } from 'lucide-react';
 
 interface FilterFormProps {
@@ -155,7 +156,7 @@ export default function FilterForm({ onFilter, countries }: FilterFormProps) {
 
           <div>
             <Label>Night Skiing</Label>
-            <Select onValueChange={(value) => setValue('night_skiing', Number(value))}>
+            <Select onValueChange={(value: '0' | '1') => setValue('night_skiing', Number(value) as 0 | 1)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select option" />
               </SelectTrigger>

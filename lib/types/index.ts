@@ -1,3 +1,18 @@
+export interface UserPreferences {
+  skillLevel: 'beginner' | 'intermediate' | 'advanced';
+  preferredTerrain: string[];
+  maxPrice: number;
+  nightSkiing: boolean;
+  snowParks: boolean;
+  minSlopes: number;
+  minLifts: number;
+  budgetRange: {
+    min: number;
+    max: number;
+  };
+  terrainPreferences: ('groomed' | 'powder' | 'park' | 'backcountry')[];
+}
+
 export interface SkiResort {
   resort_id: string;
   name: string;
@@ -10,18 +25,29 @@ export interface SkiResort {
   advanced_percentage: number;
   total_slopes: number;
   snow_parks: number;
-  night_skiing: 0 | 1;
+  night_skiing: number;
   ski_lifts: number;
   adult_day_pass: number;
   currency: string;
   season_start: string;
   season_end: string;
   image_url?: string;
+  difficulty?: {
+    beginner: number;
+    intermediate: number;
+    advanced: number;
+  };
+  pricing?: {
+    adultDayPass: number;
+  };
+  features?: {
+    snowParks: number;
+  };
 }
 
 export interface WeatherData {
   currentWeather: {
-    resort_id: string;
+  id: string;
     timestamp: number;
     temperature: number;
     feels_like: number;
@@ -66,7 +92,7 @@ export interface PaginationInfo {
 
 export interface ResortFilters {
   name?: string;
-  country_code?: string;
+  country_code?: string[];
   region?: string;
   total_slopes_min?: number;
   total_slopes_max?: number;

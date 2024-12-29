@@ -2,13 +2,13 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SkiResort, UserPreferences } from '@/lib/types';
-import { calculateMatchScore } from '@/lib/utils/recommendations';
-import { getRecommendations } from '@/lib/utils/resort-service';
-import { getWeatherData } from '@/lib/utils/weather-service';
-import ResortCard from '@/components/resort/ResortCard';
+import { SkiResort, UserPreferences } from 'lib/types/index';
+import { calculateMatchScore } from 'lib/utils/recommendations';
+import resortService from 'lib/utils/resort-service';
+import { getWeatherData } from 'lib/utils/weather-service';
+import ResortCard from 'components/resort/ResortCard/index';
 import { Loader2, CloudSnow, Thermometer } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from 'components/ui/card';
 
 export default function RecommendationsPage() {
   const searchParams = useSearchParams();
@@ -22,16 +22,37 @@ export default function RecommendationsPage() {
         const preferencesParam = searchParams.get('preferences');
         if (preferencesParam) {
           const preferences: UserPreferences = JSON.parse(preferencesParam);
-          const results = await getRecommendations(preferences);
+          const rawResults = await resortService.getRecommendations(preferences);
+          const results = rawResults.map(resort => {
+            const resortWithNewProps = {
+              ...resort,
+              difficulty: {
+                beginner: resort.beginner_percentage,
+                intermediate: resort.intermediate_percentage,
+                advanced: resort.advanced_percentage
+              },
+              pricing: {
+                adultDayPass: resort.adult_day_pass
+              },
+              features: {
+                snowParks: resort.snow_parks
+              }
+            };
+            
+            return {
+              ...resortWithNewProps,
+              matchScore: calculateMatchScore(resortWithNewProps, preferences)
+            };
+          });
           
           // Fetch weather data for all resorts
-          const weatherPromises = results.map(resort => getWeatherData(resort.id));
+          const weatherPromises = results.map(resort => getWeatherData(resort.resort_id));
           const weatherResults = await Promise.all(weatherPromises);
           
-          const weatherMap = results.reduce((acc, resort, index) => {
-            acc[resort.id] = weatherResults[index];
+          const weatherMap = results.reduce<Record<string, any>>((acc: Record<string, any>, resort: SkiResort, index: number) => {
+            acc[resort.resort_id] = weatherResults[index];
             return acc;
-          }, {} as Record<string, any>);
+          }, {});
           
           setWeatherData(weatherMap);
           setRecommendations(results);
@@ -47,15 +68,15 @@ export default function RecommendationsPage() {
   }, [searchParams]);
 
   const getWeatherSummary = () => {
-    const resorts = recommendations.filter(r => weatherData[r.id]);
+    const resorts = recommendations.filter(r => weatherData[r.resort_id]);
     if (resorts.length === 0) return null;
 
     const snowyResorts = resorts.filter(r => 
-      weatherData[r.id].current.weather[0].main.toLowerCase().includes('snow')
+      weatherData[r.resort_id].current.weather[0].main.toLowerCase().includes('snow')
     );
 
     const avgTemp = resorts.reduce((sum, r) => 
-      sum + weatherData[r.id].current.temp, 0
+      sum + weatherData[r.resort_id].current.temp, 0
     ) / resorts.length;
 
     return (
@@ -108,9 +129,9 @@ export default function RecommendationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendations.map(resort => (
             <ResortCard 
-              key={resort.id} 
+              key={resort.resort_id} 
               resort={resort} 
-              weather={weatherData[resort.id]}
+              weather={weatherData[resort.resort_id]}
             />
           ))}
         </div>

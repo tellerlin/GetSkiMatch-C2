@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
+import { Button } from 'components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { PaginationInfo } from '@/lib/types/filters';
+import { PaginationInfo } from 'lib/types/index';
 
 interface PaginationProps {
   pagination: PaginationInfo;

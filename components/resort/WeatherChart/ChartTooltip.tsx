@@ -11,7 +11,7 @@ export default function ChartTooltip({ active, payload, label }: TooltipProps) {
 
   return (
     <div className="bg-white p-3 shadow-lg rounded-lg border">
-      <p className="font-medium mb-2">{format(new Date(label), 'MMM dd')}</p>
+      <p className="font-medium mb-2">{label ? format(new Date(label), 'MMM dd') : ''}</p>
       {payload.map((entry, index) => (
         <p key={index} className="text-sm" style={{ color: entry.color }}>
           {entry.name}: {entry.value}

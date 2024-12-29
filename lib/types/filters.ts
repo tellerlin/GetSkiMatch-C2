@@ -1,7 +1,7 @@
 export interface ResortFilters {
   // 基本查询
   name?: string;
-  country_code?: string;
+  country_code?: string[];
   region?: string;
 
 
