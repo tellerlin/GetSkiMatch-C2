@@ -5,7 +5,7 @@ import { SkiResort, WeatherData } from 'lib/types';
 import ResortHeader from './ResortHeader';
 import ResortFeatures from './ResortFeatures';
 import ResortDetails from './ResortDetails';
-import WeatherForecast from './WeatherForecast';
+import Weather from './Weather';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from 'components/ui/alert';
 
@@ -161,7 +161,7 @@ export default function ResortContent({ initialData, params }: ResortContentProp
                       Last updated: {new Date(weather.currentWeather.timestamp).toLocaleString()}
                     </div>
                   )}
-                  <WeatherForecast weather={weather} />
+                  <Weather weather={weather} />
                 </>
               ) : (
                 <div className="p-4 bg-yellow-50 rounded-lg">

@@ -105,65 +105,7 @@ export interface Forecast {
 }
 
 export interface WeatherData {
-  currentWeather?: {
-    resort_id?: string;
-    timestamp?: number;
-    temperature: number;
-    feels_like: number;
-    pressure: number;
-    humidity: number;
-    weather_description: string;
-    uv_index: number;
-    wind_gust: number;
-    cloudiness: number;
-  };
-  forecast: Array<{
-    date: string;
-    temperature: {
-      max: number;
-      min: number;
-      morn: number;
-      day: number;
-      eve: number;
-      night: number;
-      feelsLikeDay: number;
-      feelsLikeNight: number;
-    };
-    wind: {
-      speed: number;
-      deg: number;
-      gust: number;
-      pressure: number;
-    };
-    conditions: {
-      main: string;
-      description: string;
-      precipitationProbability: number;
-      snowAmount: number;
-      rainAmount: number;
-      humidity: number;
-      visibility: number;
-      sunrise: string;
-      sunset: string;
-    };
-    uvIndex: number;
-    cloudiness: number;
-  }>;
-}
-
-export interface WeatherData {
-  currentWeather?: {
-    resort_id?: string;
-    timestamp?: number;
-    temperature: number;
-    feels_like: number;
-    pressure: number;
-    humidity: number;
-    weather_description: string;
-    uv_index: number;
-    wind_gust: number;
-    cloudiness: number;
-  };
+  currentWeather?: CurrentWeather;
   forecast: Array<{
     date: string;
     temperature: {
