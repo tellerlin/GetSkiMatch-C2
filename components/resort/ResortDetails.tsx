@@ -13,7 +13,8 @@ import {
   MapPin,
   Calendar,
   DollarSign,
-  ArrowDownNarrowWide
+  ArrowDownNarrowWide,
+  CloudSun
 } from 'lucide-react';
 
 interface ResortDetailsProps {
@@ -138,42 +139,48 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                 <CloudSnow className="h-6 w-6 text-blue-600" />
                 <h3 className="text-lg font-semibold">Current Weather</h3>
               </div>
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Temperature</p>
-                    <p className="font-medium">
-                      {weather.currentWeather?.temperature?.toFixed(1) ?? 'N/A'}°C
-                      <span className="block text-sm text-gray-500">
-                        Feels like {weather.currentWeather?.feels_like?.toFixed(1) ?? 'N/A'}°C
-                      </span>
-                    </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Thermometer className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Temperature</p>
+                      <p className="font-medium">
+                        {weather.currentWeather?.temperature?.toFixed(1) ?? 'N/A'}°C
+                        <span className="block text-sm text-gray-500">
+                          Feels like {weather.currentWeather?.feels_like?.toFixed(1) ?? 'N/A'}°C
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Wind</p>
-                    <p className="font-medium">
-                      {weather.currentWeather?.wind_gust?.toFixed(1) ?? 'N/A'} m/s
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <Wind className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Wind</p>
+                      <p className="font-medium">
+                        {weather.currentWeather?.wind_gust?.toFixed(1) ?? 'N/A'} m/s
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CloudSun className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Cloudiness</p>
+                      <p className="font-medium">
+                        {weather.currentWeather?.cloudiness ?? 'N/A'}%
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Conditions</p>
-                  <p className="font-medium capitalize">
-                    {weather.currentWeather?.weather_description ?? 'N/A'}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Humidity</p>
-                    <p className="font-medium">{weather.currentWeather?.humidity ?? 'N/A'}%</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">UV Index</p>
-                    <p className="font-medium">{weather.currentWeather?.uv_index ?? 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Cloudiness</p>
-                    <p className="font-medium">{weather.currentWeather?.cloudiness ?? 'N/A'}%</p>
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
+                  <div className="space-y-2">
+                    <Badge className="mr-2 text-white">
+                      {weather.currentWeather?.weather_description ?? 'N/A'}
+                    </Badge>
+                    {weather.currentWeather?.wind_gust && weather.currentWeather.wind_gust > 15 && (
+                      <Badge variant="destructive">Strong Winds</Badge>
+                    )}
                   </div>
                 </div>
               </div>
