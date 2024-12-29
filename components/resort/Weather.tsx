@@ -38,11 +38,11 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
     rainAmount: number;
     precipitationProbability: number;
   }) => {
-    if (conditions.snowAmount > 20) return { label: 'Heavy Snow', color: 'bg-blue-600' };
-    if (conditions.snowAmount > 10) return { label: 'Good Skiing', color: 'bg-green-500' };
-    if (conditions.rainAmount > 0) return { label: 'Wet Conditions', color: 'bg-yellow-500' };
-    if (conditions.precipitationProbability > 50) return { label: 'Precipitation Likely', color: 'bg-yellow-500' };
-    return { label: 'Fair', color: 'bg-gray-500' };
+    if (conditions.snowAmount > 20) return { label: 'Heavy Snow', color: 'bg-blue-600 text-white' };
+    if (conditions.snowAmount > 10) return { label: 'Good Skiing', color: 'bg-green-500 text-white' };
+    if (conditions.rainAmount > 0) return { label: 'Wet Conditions', color: 'bg-yellow-500 text-white' };
+    if (conditions.precipitationProbability > 50) return { label: 'Precipitation Likely', color: 'bg-yellow-500 text-white' };
+    return { label: 'Fair', color: 'bg-gray-500 text-white' };
   };
 
   const formatDateSafely = (dateString: string, formatString: string = 'EEE, MMM d'): string => {
@@ -215,26 +215,10 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
 
   return (
     <section className="w-full" role="region" aria-label="Weather Information">
-      <Tabs defaultValue="current" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="current">Current Weather</TabsTrigger>
-          <TabsTrigger value="forecast">Forecast</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="current">
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Current Conditions</h2>
-            <CurrentWeatherSection />
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="forecast">
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Weather Forecast</h2>
-            <ForecastSection />
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-4">Weather Forecast</h2>
+        <ForecastSection />
+      </Card>
     </section>
   );
 });
