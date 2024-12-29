@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card } from 'components/ui/card';
 import { Badge } from 'components/ui/badge';
-import { memo } from 'react';
-import ResortImage from './ResortImage';
-import { Thermometer, CloudSnow } from 'lucide-react';
+import { memo, useState } from 'react';
+import { Thermometer, CloudSnow, Mountain, DollarSign, Moon, CableCar } from 'lucide-react';
 
 interface SkiResort {
   resort_id: string;
@@ -34,14 +34,25 @@ interface ResortCardProps {
 }
 
 const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
+  const [imageError, setImageError] = useState(false);
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: resort.currency || 'USD',
   }).format(resort.adult_day_pass);
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 focus-within:ring-2 focus-within:ring-blue-400 h-full flex flex-col">
-      <ResortImage imageUrl={resort.image_url || ''} name={resort.name} />
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-400 h-full flex flex-col">
+      <div className="relative h-48 bg-gray-200">
+        <Image
+          src={imageError ? '/images/placeholder.jpg' : (resort.image_url || '/images/placeholder.jpg')}
+          alt={`View of ${resort.name} ski resort`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-opacity duration-300"
+          loading="lazy"
+          onError={() => setImageError(true)}
+        />
+      </div>
 
       <div className="p-6 flex flex-col flex-grow">
         <div className="h-[76px]">

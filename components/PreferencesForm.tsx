@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
+import { debounce } from 'lodash';
 
 const initialFilters = {
   name: '',
@@ -29,8 +30,9 @@ export default function PreferencesForm() {
   const router = useRouter();
   const [filters, setFilters] = useState(initialFilters);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 优化：使用 useMemo 缓存国家选项列表，避免每次渲染都重新计算
+  // 优化：使用 useMemo 缓存国家选项列表
   const countryOptions = useMemo(
     () => [
       { value: 'any', label: 'Any' },
@@ -38,8 +40,6 @@ export default function PreferencesForm() {
       { value: 'CA', label: 'Canada' },
       { value: 'FR', label: 'France' },
       { value: 'CH', label: 'Switzerland' },
-      { value: 'IT', label: 'Italy' },
-      { value: 'AT', label: 'Austria' },
       { value: 'JP', label: 'Japan' },
     ],
     []
@@ -58,34 +58,46 @@ export default function PreferencesForm() {
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
-  // 当 filters 更新时验证表单
+  // 优化：使用 debounce 处理验证
+  const debouncedValidate = useMemo(
+    () => debounce(() => validate(), 300),
+    [filters]
+  );
+
   useEffect(() => {
-    validate();
-  }, [filters]);
+    debouncedValidate();
+    return () => debouncedValidate.cancel();
+  }, [filters, debouncedValidate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    if (!validate()) return;
+    try {
+      if (!validate()) return;
 
-    const queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== initialFilters[key as keyof typeof initialFilters]) {
-        if (
-          (typeof value === 'number' && !isNaN(value)) ||
-          (typeof value === 'string' && value !== '')
-        ) {
-          queryParams.append(key, value.toString());
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== initialFilters[key as keyof typeof initialFilters]) {
+          if (
+            (typeof value === 'number' && !isNaN(value)) ||
+            (typeof value === 'string' && value !== '')
+          ) {
+            queryParams.append(key, value.toString());
+          }
         }
-      }
-    });
+      });
 
-    router.push(`/resorts?${queryParams.toString()}`);
+      router.push(`/resorts?${queryParams.toString()}`);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -215,8 +227,12 @@ export default function PreferencesForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-white" disabled={Object.keys(errors).length > 0}>
-        Find Resorts
+      <Button 
+        type="submit" 
+        className="w-full text-white" 
+        disabled={Object.keys(errors).length > 0 || isSubmitting}
+      >
+        {isSubmitting ? 'Searching...' : 'Find Resorts'}
       </Button>
     </form>
   );
