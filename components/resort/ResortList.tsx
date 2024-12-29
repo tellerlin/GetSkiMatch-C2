@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react';
 import Pagination from '../filters/Pagination';
 
 export default function ResortList() {
-  const [resorts, setResorts] = useState<Array<SkiResort & { night_skiing: 0 | 1 }>>([]);
+  const [resorts, setResorts] = useState<Array<SkiResort>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -26,10 +26,8 @@ export default function ResortList() {
       setError(null);
 
       try {
-        // 构建查询参数
         const params = new URLSearchParams(searchParams?.toString() || '');
         
-        // 确保分页参数存在
         if (!params.has('page')) params.set('page', '1');
         if (!params.has('limit')) params.set('limit', '12');
 
@@ -40,25 +38,40 @@ export default function ResortList() {
         }
 
         const data = await response.json();
-        
+        console.log('API Response:', data); // 添加日志以检查API响应
+
         if (data.resorts && Array.isArray(data.resorts)) {
-          setResorts(data.resorts);
+          // 获取每个滑雪场的详细信息
+          const detailedResorts = await Promise.all(
+            data.resorts.map(async (resort: SkiResort) => {
+              try {
+                const detailResponse = await fetch(`https://ski-query-worker.3we.org/resort?id=${resort.resort_id}`);
+                const detailData = await detailResponse.json();
+                console.log('Detail Response for', resort.resort_id, ':', detailData); // 添加日志
+                
+                return {
+                  ...resort,
+                  slopes_description: detailData.resort?.slopes_description,
+                  weather_agency: detailData.resort?.weather_agency,
+                  currentWeather: detailData.currentWeather
+                };
+              } catch (error) {
+                console.error('Error fetching resort details:', error);
+                return resort;
+              }
+            })
+          );
+
+          setResorts(detailedResorts);
           setPagination({
             total: data.pagination.total,
             page: data.pagination.page,
             limit: data.pagination.limit,
             total_pages: data.pagination.total_pages
           });
-        } else {
-          setResorts([]);
-          setPagination({
-            total: 0,
-            page: 1,
-            limit: 12,
-            total_pages: 0
-          });
         }
       } catch (err) {
+        console.error('Error fetching resorts:', err);
         setError(err instanceof Error ? err.message : 'An error occurred while fetching resorts');
         setResorts([]);
       } finally {

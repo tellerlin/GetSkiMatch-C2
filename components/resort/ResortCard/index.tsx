@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { Card } from 'components/ui/card';
+import { Badge } from 'components/ui/badge';
 import { memo } from 'react';
 import ResortImage from './ResortImage';
-import ResortInfo from './ResortInfo';
-import NightSkiingBadge from './NightSkiingBadge';
+import { Thermometer, CloudSnow } from 'lucide-react';
 
 interface SkiResort {
   resort_id: string;
@@ -31,10 +31,9 @@ interface SkiResort {
 
 interface ResortCardProps {
   resort: SkiResort;
-  weather?: any;
 }
 
-const ResortCard = memo(function ResortCard({ resort, weather }: ResortCardProps) {
+const ResortCard = memo(function ResortCard({ resort }: ResortCardProps) {
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: resort.currency || 'USD',
@@ -56,69 +55,63 @@ const ResortCard = memo(function ResortCard({ resort, weather }: ResortCardProps
             {resort.country_code}
           </p>
           {resort.currentWeather && (
-            <div className="flex items-center gap-1 mt-1">
-              <span className="text-sm font-medium">
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Thermometer className="h-4 w-4" />
                 {Math.round(resort.currentWeather.temperature)}°C
-              </span>
-              <span className="text-sm text-gray-600">
+              </Badge>
+              <Badge variant="secondary" className="capitalize">
                 {resort.currentWeather.weather_description}
-              </span>
+              </Badge>
             </div>
           )}
         </div>
 
         <div className="flex-grow">
-          <div className="space-y-2">
-            {resort.slopes_description && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {resort.slopes_description}
-                </p>
-              </div>
-            )}
-            <div className="flex flex-wrap gap-2 text-sm">
-              <div className="bg-gray-100 px-2 py-1 rounded">
-                {resort.total_slopes} slopes
-              </div>
-              {resort.snow_parks && (
-                <div className="bg-gray-100 px-2 py-1 rounded">
-                  {resort.snow_parks} snow parks
-                </div>
-              )}
-              {resort.ski_lifts && (
-                <div className="bg-gray-100 px-2 py-1 rounded">
-                  {resort.ski_lifts} ski lifts
-                </div>
-              )}
+          {resort.slopes_description && (
+            <div className="bg-gray-50 p-3 rounded-lg mb-4">
+              <p className="text-sm text-gray-700 line-clamp-3">
+                {resort.slopes_description}
+              </p>
             </div>
-            <div className="text-sm text-gray-600">
-              Season: {resort.season_start} - {resort.season_end}
+          )}
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-sm text-gray-600">Total Slopes</p>
+              <p className="font-medium">{resort.total_slopes}</p>
             </div>
-            {resort.weather_agency && (
-              <div className="text-sm text-gray-600">
-                Weather data by {resort.weather_agency}
-              </div>
-            )}
-            <div className="font-medium">
-              {formattedPrice} / day
+            <div>
+              <p className="text-sm text-gray-600">Ski Lifts</p>
+              <p className="font-medium">{resort.ski_lifts}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Snow Parks</p>
+              <p className="font-medium">{resort.snow_parks}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Day Pass</p>
+              <p className="font-medium">{formattedPrice}</p>
             </div>
           </div>
 
-          {resort.night_skiing === 1 && (
-            <div className="mt-4">
-              <NightSkiingBadge />
+          <div className="text-sm text-gray-600 mb-4">
+            Season: {resort.season_start} - {resort.season_end}
+          </div>
+
+          {resort.weather_agency && (
+            <div className="text-xs text-gray-500 mb-4">
+              Weather data by {resort.weather_agency}
             </div>
           )}
         </div>
 
-        <div className="mt-6">
-          <Link
-            href={`/ski-resort/${resort.resort_id}`}
-            className="inline-block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            View Details
-          </Link>
-        </div>
+        <Link
+          href={`/ski-resort/${resort.resort_id}`}
+          className="inline-block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          View Details
+        </Link>
       </div>
     </Card>
   );
