@@ -5,7 +5,9 @@ import { Badge } from 'components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
 import { 
   Cloud, Thermometer, Wind, Sun, Snowflake,
-  AlertTriangle, CloudSun, Droplets
+  AlertTriangle, CloudSun, Droplets,
+  CloudRain, CloudSnow, CloudLightning,
+  CloudDrizzle, Haze
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { memo, useEffect } from 'react';
@@ -43,6 +45,30 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
     if (conditions.rainAmount > 0) return { label: 'Wet Conditions', color: 'bg-yellow-500 text-white' };
     if (conditions.precipitationProbability > 50) return { label: 'Precipitation Likely', color: 'bg-yellow-500 text-white' };
     return { label: 'Fair', color: 'bg-gray-500 text-white' };
+  };
+
+  const getWeatherIcon = (condition: string) => {
+    const iconSize = 'h-6 w-6';
+    switch (condition.toLowerCase()) {
+      case 'clear':
+        return <Sun className={`${iconSize} text-yellow-400`} />;
+      case 'clouds':
+        return <Cloud className={`${iconSize} text-gray-500`} />;
+      case 'rain':
+        return <CloudRain className={`${iconSize} text-blue-500`} />;
+      case 'snow':
+        return <CloudSnow className={`${iconSize} text-blue-300`} />;
+      case 'thunderstorm':
+        return <CloudLightning className={`${iconSize} text-yellow-500`} />;
+      case 'drizzle':
+        return <CloudDrizzle className={`${iconSize} text-blue-400`} />;
+      case 'mist':
+      case 'fog':
+      case 'haze':
+        return <Haze className={`${iconSize} text-gray-400`} />;
+      default:
+        return <CloudSun className={`${iconSize} text-gray-500`} />;
+    }
   };
 
   const formatDateSafely = (dateString: string, formatString: string = 'EEE, MMM d'): string => {
@@ -174,6 +200,13 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
                     </Badge>
                   </div>
 
+                  <div className="flex items-center gap-4 mb-4">
+                    {getWeatherIcon(day.conditions.main)}
+                    <div>
+                      <p className="font-medium capitalize">{day.conditions.description}</p>
+                      <p className="text-sm text-gray-600">Conditions</p>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <WeatherMetric
                       icon={<Thermometer className="h-4 w-4" />}
