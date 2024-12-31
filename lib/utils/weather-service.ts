@@ -9,6 +9,7 @@ export interface WeatherData {
     pressure: number;
     humidity: number;
     weather_description: string;
+    icon_id: string;
     uv_index: number;
     wind_gust: number;
     cloudiness: number;
@@ -29,6 +30,7 @@ export interface WeatherData {
     conditions: {
       main: string;
       description: string;
+      icon_id: string;
       precipitationProbability: number;
       snowAmount: number;
       rainAmount: number;
@@ -38,6 +40,27 @@ export interface WeatherData {
   }>;
 }
 
+export async function getWeatherData(resortId: string): Promise<WeatherData> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resort?id=${resortId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch weather data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (!validateWeatherData(data)) {
+      throw new Error('Invalid weather data structure received from API');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching weather data:', error);
+    throw error;
+  }
+}
+
 const validateWeatherData = (data: any): data is WeatherData => {
   if (!data) return false;
 
@@ -45,7 +68,8 @@ const validateWeatherData = (data: any): data is WeatherData => {
     typeof data.currentWeather.temperature === 'number' &&
     typeof data.currentWeather.feels_like === 'number' &&
     typeof data.currentWeather.wind_gust === 'number' &&
-    typeof data.currentWeather.weather_description === 'string';
+    typeof data.currentWeather.weather_description === 'string' &&
+    (data.currentWeather.icon_id === undefined || typeof data.currentWeather.icon_id === 'string');
 
   const hasValidForecast = Array.isArray(data.forecast) &&
     data.forecast.every((day: any) => 
@@ -54,42 +78,9 @@ const validateWeatherData = (data: any): data is WeatherData => {
       typeof day.temperature.max === 'number' &&
       typeof day.temperature.min === 'number' &&
       typeof day.wind === 'object' &&
-      typeof day.conditions === 'object'
+      typeof day.conditions === 'object' &&
+      (day.conditions.icon_id === undefined || typeof day.conditions.icon_id === 'string')
     );
 
   return hasValidCurrentWeather && hasValidForecast;
-};
-
-export async function getWeatherData(resortId: string): Promise<WeatherData | null> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    const url = `${API_BASE_URL}/resort?id=${resortId}`;
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    
-    const weatherData = {
-      currentWeather: data.currentWeather,
-      forecast: data.forecast.map((day: any) => ({
-        ...day,
-        date: new Date(day.date).toISOString()
-      }))
-    };
-
-    return validateWeatherData(weatherData) ? weatherData : null;
-
-  } catch (error) {
-    return null;
-  }
 }

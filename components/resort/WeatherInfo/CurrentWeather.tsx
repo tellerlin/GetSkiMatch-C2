@@ -8,11 +8,12 @@ interface CurrentWeatherProps {
 }
 
 export default function CurrentWeather({ weather }: CurrentWeatherProps) {
-  if (!weather.currentWeather) {
+  if (!weather?.currentWeather) {
     return (
       <div className="text-center text-gray-500 py-6">
         <Cloud className="h-8 w-8 mx-auto mb-2" />
-        <p>Current weather data is unavailable</p>
+        <p>Weather data is currently unavailable</p>
+        <p className="text-sm mt-1">Please try again later</p>
       </div>
     );
   }
