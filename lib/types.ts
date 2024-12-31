@@ -56,6 +56,7 @@ export interface CurrentWeather {
   pressure: number;              // 气压（hPa）
   humidity: number;              // 湿度（%）
   weather_description: string;   // 天气描述（如 "Sunny", "Snowy" 等）
+  icon_id: string;               // 天气图标ID（三位字符）
   uv_index: number;              // 紫外线指数
   wind_gust: number;             // 阵风速度（km/h 或 mph）
   cloudiness: number;            // 云量（%）
@@ -91,6 +92,7 @@ export interface Forecast {
   conditions: {
     main: string;                     // 主要天气状况（如 "Rain", "Snow"）
     description: string;              // 天气详细描述
+    icon_id: string;                  // 天气图标ID（三位字符）
     precipitationProbability: number; // 降水概率（%）
     snowAmount: number;               // 降雪量（cm 或 inches）
     rainAmount: number;               // 降雨量（mm 或 inches）

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ResortCard from './ResortCard';
 import { SkiResort } from '../../lib/types/index';
@@ -9,6 +9,7 @@ import Pagination from '../filters/Pagination';
 
 export default function ResortList() {
   const [resorts, setResorts] = useState<Array<SkiResort>>([]);
+  const resortsRef = useRef<Array<SkiResort>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -27,23 +28,35 @@ export default function ResortList() {
 
       try {
         const params = new URLSearchParams(searchParams?.toString() || '');
+        console.log('Search Parameters:', Object.fromEntries(params.entries()));
         
         if (!params.has('page')) params.set('page', '1');
         if (!params.has('limit')) params.set('limit', '12');
 
-        const response = await fetch(`https://ski-query-worker.3we.org/resorts?${params.toString()}`);
+        const apiUrl = `https://ski-query-worker.3we.org/resorts?${params.toString()}`;
+        console.log('API Request URL:', apiUrl);
+        
+        const response = await fetch(apiUrl);
+        console.log('API Response Status:', response.status);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch resorts');
+          const errorData = await response.json();
+          console.error('API Error Response:', errorData);
+          throw new Error(errorData.message || 'Failed to fetch resorts');
         }
 
-        const data = await response.json();
-        console.log('API Response:', data); // 添加日志以检查API响应
-
-        if (data.resorts && Array.isArray(data.resorts)) {
+        const responseData = await response.json();
+        console.log('API Response:', responseData); // 添加日志以检查API响应
+        
+        // 根据API响应结构调整数据访问
+        console.log('Full API Response:', responseData);
+        const resortsData = responseData.data || responseData;
+        console.log('Checking resorts data:', resortsData);
+        if (resortsData && Array.isArray(resortsData)) {
+          console.log('Resorts data is valid array, length:', resortsData.length);
           // 获取每个滑雪场的详细信息
           const detailedResorts = await Promise.all(
-            data.resorts.map(async (resort: any) => {
+            resortsData.map(async (resort: any) => {
               try {
                 const detailResponse = await fetch(`https://ski-query-worker.3we.org/resort?id=${resort.resort_id}`);
                 const detailData = await detailResponse.json();
@@ -68,13 +81,20 @@ export default function ResortList() {
             })
           );
 
-          setResorts(detailedResorts);
-          setPagination({
-            total: data.pagination.total,
-            page: data.pagination.page,
-            limit: data.pagination.limit,
-            total_pages: data.pagination.total_pages
+          console.log('Detailed Resorts:', detailedResorts);
+          console.log('Setting resorts with:', detailedResorts);
+          setResorts(prev => {
+            console.log('Previous resorts state:', prev);
+            return detailedResorts;
           });
+          resortsRef.current = detailedResorts;
+          setPagination({
+            total: responseData.pagination.total,
+            page: responseData.pagination.page,
+            limit: responseData.pagination.limit,
+            total_pages: responseData.pagination.total_pages
+          });
+          console.log('Resorts state after set:', detailedResorts);
         }
       } catch (err) {
         console.error('Error fetching resorts:', err);
@@ -104,7 +124,9 @@ export default function ResortList() {
     );
   }
 
+  console.log('Rendering resorts:', resorts);
   if (resorts.length === 0) {
+    console.log('No resorts found, showing empty state');
     return (
       <div className="text-center py-8">
         <div className="bg-blue-50 rounded-lg p-6 inline-block">
@@ -120,8 +142,8 @@ export default function ResortList() {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {resorts.map(resort => (
-          <ResortCard key={resort.resort_id} resort={resort} />
+        {resorts.map((resort, index) => (
+          <ResortCard key={`${resort.resort_id}-${index}`} resort={resort} />
         ))}
       </div>
 

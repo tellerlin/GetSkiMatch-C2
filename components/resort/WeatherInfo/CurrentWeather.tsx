@@ -41,9 +41,16 @@ export default function CurrentWeather({ weather }: CurrentWeatherProps) {
       <div className="p-4 bg-blue-50 rounded-lg">
         <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
         <div className="space-y-2">
-          <Badge className="mr-2">
-            {weather.currentWeather.weather_description}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <img
+              src={`https://openweathermap.org/img/wn/${weather.currentWeather.icon_id}@2x.png`}
+              alt="Weather icon"
+              className="w-6 h-6"
+            />
+            <Badge>
+              {weather.currentWeather.weather_description}
+            </Badge>
+          </div>
           {weather.currentWeather.wind_gust > 15 && (
             <Badge variant="destructive">Strong Winds</Badge>
           )}

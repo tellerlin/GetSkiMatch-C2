@@ -15,6 +15,7 @@ interface ForecastDayProps {
       gust: number;
     };
     conditions: {
+      icon_id: string;
       precipitationProbability: number;
       snowAmount: number;
     };
@@ -35,9 +36,16 @@ export default function ForecastDay({ day }: ForecastDayProps) {
   return (
     <Card className="p-4">
       <div className="flex justify-between items-center mb-2">
-        <span className="font-medium">
-          {format(new Date(day.date), 'MMM dd')}
-        </span>
+        <div className="flex items-center gap-2">
+          <img 
+            src={`https://openweathermap.org/img/wn/${day.conditions.icon_id}@2x.png`}
+            alt="Weather icon"
+            className="w-8 h-8"
+          />
+          <span className="font-medium">
+            {format(new Date(day.date), 'MMM dd')}
+          </span>
+        </div>
         <Badge className={badge.color}>{badge.label}</Badge>
       </div>
       
