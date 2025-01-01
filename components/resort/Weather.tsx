@@ -47,28 +47,13 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
     return { label: 'Fair', color: 'bg-gray-500 text-white' };
   };
 
-  const getWeatherIcon = (condition: string) => {
-    const iconSize = 'h-6 w-6';
-    switch (condition.toLowerCase()) {
-      case 'clear':
-        return <Sun className={`${iconSize} text-yellow-400`} />;
-      case 'clouds':
-        return <Cloud className={`${iconSize} text-gray-500`} />;
-      case 'rain':
-        return <CloudRain className={`${iconSize} text-blue-500`} />;
-      case 'snow':
-        return <CloudSnow className={`${iconSize} text-blue-300`} />;
-      case 'thunderstorm':
-        return <CloudLightning className={`${iconSize} text-yellow-500`} />;
-      case 'drizzle':
-        return <CloudDrizzle className={`${iconSize} text-blue-400`} />;
-      case 'mist':
-      case 'fog':
-      case 'haze':
-        return <Haze className={`${iconSize} text-gray-400`} />;
-      default:
-        return <CloudSun className={`${iconSize} text-gray-500`} />;
-    }
+
+  const getWeatherIcon = (icon_id: string) => {
+    return <img 
+      src={`https://openweathermap.org/img/wn/${icon_id}@2x.png`}
+      alt="Weather icon"
+      className="h-12 w-12"
+    />;
   };
 
   const formatDateSafely = (dateString: string, formatString: string = 'EEE, MMM d'): string => {
@@ -139,19 +124,16 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
             value={`${formatTemperature(weather.currentWeather.temperature)}°C`}
             subValue={`Feels like ${formatTemperature(weather.currentWeather.feels_like)}°C`}
           />
-          {weather.currentWeather.wind_speed && (
-            <WeatherMetric
-              icon={<Wind className="h-5 w-5 text-blue-600" />}
-              label="Wind"
-              value={`${weather.currentWeather.wind_speed} m/s`}
-              subValue={weather.currentWeather.wind_deg ? `Direction: ${getWindDirection(weather.currentWeather.wind_deg)}` : undefined}
-            />
-          )}
-          <WeatherMetric
-            icon={<CloudSun className="h-5 w-5 text-blue-600" />}
-            label="Cloudiness"
-            value={`${weather.currentWeather.cloudiness}%`}
-          />
+        <WeatherMetric
+          icon={<Wind className="h-5 w-5 text-blue-600" />}
+          label="Wind Gust"
+          value={`${weather.currentWeather.wind_gust} m/s`}
+        />
+        <WeatherMetric
+          icon={<CloudSun className="h-5 w-5 text-blue-600" />}
+          label="Cloudiness"
+          value={`${weather.currentWeather.cloudiness}%`}
+        />
         </div>
 
         <div className="space-y-4">
@@ -201,7 +183,7 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
                   </div>
 
                   <div className="flex items-center gap-4 mb-4">
-                    {getWeatherIcon(day.conditions.main)}
+                    {getWeatherIcon(day.conditions.icon_id)}
                     <div>
                       <p className="font-medium capitalize">{day.conditions.description}</p>
                       <p className="text-sm text-gray-600">Conditions</p>

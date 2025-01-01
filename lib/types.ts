@@ -50,96 +50,51 @@ export interface SkiResort {
 // 当前天气接口
 export interface CurrentWeather {
   resort_id: string;
-  timestamp: number;             // Unix 时间戳
-  temperature: number;           // 温度（摄氏度或华氏度）
-  feels_like: number;            // 体感温度
-  pressure: number;              // 气压（hPa）
-  humidity: number;              // 湿度（%）
-  weather_description: string;   // 天气描述（如 "Sunny", "Snowy" 等）
-  icon_id: string;               // 天气图标ID（三位字符）
-  uv_index: number;              // 紫外线指数
-  wind_gust: number;             // 阵风速度（km/h 或 mph）
-  cloudiness: number;            // 云量（%）
-  wind_speed?: number;           // 风速
-  wind_deg?: number;             // 风向
+  timestamp: number;
+  temperature: number;
+  feels_like: number;
+  pressure: number;
+  humidity: number;
+  weather_description: string;
+  icon_id: string;
+  uv_index: number;
+  wind_gust: number;
+  cloudiness: number;
 }
 
 // 天气预报接口
 export interface Forecast {
-  date: string; // 预报日期（ISO 格式）
+  date: string;
 
-  // 温度信息
   temperature: {
-    max: number;           // 最高温度
-    min: number;           // 最低温度
-    morn: number;          // 上午温度
-    day: number;           // 白天天温度
-    eve: number;           // 傍晚温度
-    night: number;         // 夜间温度
-    feelsLikeDay: number;  // 白天体感温度
-    feelsLikeNight: number;// 夜间体感温度
+    max: number;
+    min: number;
+    feelsLikeDay: number;
+    feelsLikeNight: number;
   };
 
-  // 风力信息
   wind: {
-    speed: number;   // 风速
-    deg: number;     // 风向（度数）
-    gust: number;    // 阵风速度
-    pressure: number; // 气压
+    speed: number;
+    direction: number;
+    gust: number;
   };
 
-  // 天气条件
   conditions: {
-    main: string;                     // 主要天气状况（如 "Rain", "Snow"）
-    description: string;              // 天气详细描述
-    icon_id: string;                  // 天气图标ID（三位字符）
-    precipitationProbability: number; // 降水概率（%）
-    snowAmount: number;               // 降雪量（cm 或 inches）
-    rainAmount: number;               // 降雨量（mm 或 inches）
-    humidity: number;                 // 湿度（%）
-    visibility: number;               // 能见度（米或英尺）
-    sunrise: string;                  // 日出时间（ISO 格式）
-    sunset: string;                    // 日落时间（ISO 格式）
+    main: string;
+    description: string;
+    icon_id: string;
+    precipitationProbability: number;
+    snowAmount: number;
+    rainAmount: number;
   };
 
-  uvIndex: number;      // 紫外线指数
-  cloudiness: number;   // 云量（%）
+  uvIndex: number;
+  cloudiness: number;
 }
 
 export interface WeatherData {
-  currentWeather?: CurrentWeather;
-  forecast: Array<{
-    date: string;
-    temperature: {
-      max: number;
-      min: number;
-      morn: number;
-      day: number;
-      eve: number;
-      night: number;
-      feelsLikeDay: number;
-      feelsLikeNight: number;
-    };
-    wind: {
-      speed: number;
-      deg: number;
-      gust: number;
-      pressure: number;
-    };
-    conditions: {
-      main: string;
-      description: string;
-      precipitationProbability: number;
-      snowAmount: number;
-      rainAmount: number;
-      humidity: number;
-      visibility: number;
-      sunrise: string;
-      sunset: string;
-    };
-    uvIndex: number;
-    cloudiness: number;
-  }>;
+  currentWeather: CurrentWeather;
+  forecast: Forecast[];
 }
 
 export interface Country {
