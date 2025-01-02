@@ -172,10 +172,18 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h3 className="font-medium text-blue-800 mb-2">Current Conditions</h3>
-                  <div className="space-y-2">
-                    <Badge className="mr-2 text-white">
+
+                <div className="p-4 bg-blue-50 rounded-lg flex flex-col items-start space-y-2">
+                  <h3 className="font-medium text-blue-800">Current Conditions</h3>
+                  {weather.currentWeather?.icon_id && (
+                    <img 
+                      src={`https://openweathermap.org/img/wn/${weather.currentWeather.icon_id}@2x.png`}
+                      alt="Current Weather Icon"
+                      className="h-12 w-12 self-center"
+                    />
+                  )}
+                  <div className="space-y-2 w-full">
+                    <Badge className="text-white">
                       {weather.currentWeather?.weather_description ?? 'N/A'}
                     </Badge>
                     {weather.currentWeather?.wind_gust && weather.currentWeather.wind_gust > 15 && (
@@ -183,6 +191,8 @@ export default function ResortDetails({ resort, weather }: ResortDetailsProps) {
                     )}
                   </div>
                 </div>
+
+                
               </div>
             </div>
           </Card>
