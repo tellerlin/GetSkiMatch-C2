@@ -25,14 +25,16 @@ export default function ResortList() {
     const fetchResorts = async () => {
       setIsLoading(true);
       setError(null);
-
+  
+  
       try {
         const params = new URLSearchParams(searchParams?.toString() || '');
         console.log('Search Parameters:', Object.fromEntries(params.entries()));
         
         if (!params.has('page')) params.set('page', '1');
         if (!params.has('limit')) params.set('limit', '12');
-
+  
+  
         const apiUrl = `https://ski-query-worker.3we.org/resorts?${params.toString()}`;
         console.log('API Request URL:', apiUrl);
         
@@ -44,23 +46,27 @@ export default function ResortList() {
           console.error('API Error Response:', errorData);
           throw new Error(errorData.message || 'Failed to fetch resorts');
         }
-
+  
+  
         const responseData = await response.json();
-        console.log('API Response:', responseData); // 添加日志以检查API响应
-        
-        // 根据API响应结构调整数据访问
         console.log('Full API Response:', responseData);
-        const resortsData = responseData.data || responseData;
+  
+  
+        // 修改这部分代码
+        const resortsData = responseData.resorts || [];
         console.log('Checking resorts data:', resortsData);
+  
+  
         if (resortsData && Array.isArray(resortsData)) {
           console.log('Resorts data is valid array, length:', resortsData.length);
+          
           // 获取每个滑雪场的详细信息
           const detailedResorts = await Promise.all(
             resortsData.map(async (resort: any) => {
               try {
                 const detailResponse = await fetch(`https://ski-query-worker.3we.org/resort?id=${resort.resort_id}`);
                 const detailData = await detailResponse.json();
-                console.log('Detail Response for', resort.resort_id, ':', detailData); // 添加日志
+                console.log('Detail Response for', resort.resort_id, ':', detailData);
                 
                 // Convert night_skiing to 0 | 1
                 const nightSkiing = resort.night_skiing ? 1 : 0;
@@ -72,7 +78,8 @@ export default function ResortList() {
                   weather_agency: detailData.resort?.weather_agency,
                   currentWeather: detailData.currentWeather
                 };
-
+  
+  
                 return convertedResort;
               } catch (error) {
                 console.error('Error fetching resort details:', error);
@@ -80,21 +87,30 @@ export default function ResortList() {
               }
             })
           );
-
+  
+  
           console.log('Detailed Resorts:', detailedResorts);
-          console.log('Setting resorts with:', detailedResorts);
-          setResorts(prev => {
-            console.log('Previous resorts state:', prev);
-            return detailedResorts;
-          });
+          setResorts(detailedResorts);
           resortsRef.current = detailedResorts;
+          
+          // 使用 responseData.pagination 设置分页信息
           setPagination({
             total: responseData.pagination.total,
             page: responseData.pagination.page,
             limit: responseData.pagination.limit,
             total_pages: responseData.pagination.total_pages
           });
+          
           console.log('Resorts state after set:', detailedResorts);
+        } else {
+          // 如果没有数据，设置空数组
+          setResorts([]);
+          setPagination({
+            total: 0,
+            page: 1,
+            limit: 12,
+            total_pages: 0
+          });
         }
       } catch (err) {
         console.error('Error fetching resorts:', err);
@@ -104,7 +120,8 @@ export default function ResortList() {
         setIsLoading(false);
       }
     };
-
+  
+  
     fetchResorts();
   }, [searchParams]);
 

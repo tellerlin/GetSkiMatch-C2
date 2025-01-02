@@ -13,6 +13,7 @@ export interface UserPreferences {
   terrainPreferences: ('groomed' | 'powder' | 'park' | 'backcountry')[];
 }
 
+
 export interface SkiResort {
   resort_id: string;
   name: string;
@@ -20,6 +21,7 @@ export interface SkiResort {
   region: string;
   latitude: number;
   longitude: number;
+  slopes_description?: string;  // 新增
   total_slopes: number;
   snow_parks: number;
   night_skiing: 0 | 1;
@@ -29,17 +31,11 @@ export interface SkiResort {
   season_start: string;
   season_end: string;
   image_url?: string;
-  pricing?: {
-    adultDayPass: number;
-  };
-  features?: {
-    snowParks: number;
-  };
 }
+
 
 export interface WeatherData {
   currentWeather: {
-  id: string;
     timestamp: number;
     temperature: number;
     feels_like: number;
@@ -49,31 +45,35 @@ export interface WeatherData {
     uv_index: number;
     wind_gust: number;
     cloudiness: number;
+    icon_id: string;  // 新增
   };
   forecast: Array<{
-    date: string;
-    temperature: {
-      max: number;
-      min: number;
-      feelsLikeDay: number;
-      feelsLikeNight: number;
-    };
-    wind: {
-      speed: number;
-      direction: number;
-      gust: number;
-    };
+    forecast_date: string;  // 改为 forecast_date
+    temperature_max: number;
+    temperature_min: number;
+    feels_like_day: number;
+    feels_like_night: number;
+    precipitation_probability: number;
+    weather_main: string;
+    weather_description: string;
+    wind_speed: number;
+    wind_direction: number;
+    snow_amount: number;
+    rain_amount: number;
+    uv_index: number;
+    wind_gust: number;
+    cloudiness: number;
     conditions: {
       main: string;
       description: string;
       precipitationProbability: number;
       snowAmount: number;
       rainAmount: number;
+      icon_id: string;  // 新增
     };
-    uv_index: number;
-    cloudiness: number;
   }>;
 }
+
 
 export interface PaginationInfo {
   total: number;
