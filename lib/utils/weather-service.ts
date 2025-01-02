@@ -46,6 +46,16 @@ interface ApiResponse {
     region: string;
     latitude: number;
     longitude: number;
+    slopes_description: string;
+    total_slopes: number;
+    snow_parks: number;
+    night_skiing: number;
+    ski_lifts: number;
+    adult_day_pass: number;
+    currency: string;
+    season_start: string;
+    season_end: string;
+    image_url: string;
   };
   currentWeather: {
     resort_id: string;
@@ -79,10 +89,11 @@ interface ApiResponse {
       snowAmount: number;
       rainAmount: number;
     };
-    uv_index: number;
+    uvIndex: number;
     cloudiness: number;
   }>;
 }
+
 
 function parseApiResponse(responseText: string): ApiResponse {
   try {
@@ -127,54 +138,81 @@ function parseApiResponse(responseText: string): ApiResponse {
   }
 }
 
-function transformWeatherData(apiResponse: ApiResponse): WeatherData {
-  return {
-    currentWeather: apiResponse.currentWeather,
-    forecast: apiResponse.forecast.map(day => ({
-      date: day.forecast_date, // 修改为 forecast_date
-      temperature: {
-        max: day.temperature_max,
-        min: day.temperature_min,
-        feelsLikeDay: day.feels_like_day,
-        feelsLikeNight: day.feels_like_night
-      },
-      wind: {
-        speed: day.wind_speed,
-        direction: day.wind_direction,
-        gust: day.wind_gust
-      },
-      conditions: {
-        main: day.conditions.main,
-        description: day.conditions.description,
-        icon_id: day.conditions.icon_id, // 确保传递 icon_id
-        precipitationProbability: day.precipitation_probability / 100,
-        snowAmount: day.snow_amount,
-        rainAmount: day.rain_amount
-      },
-      uv_index: day.uv_index,
-      cloudiness: day.cloudiness
-    }))
-  };
-}
 
 export async function getWeatherData(resortId: string): Promise<WeatherData> {
   try {
     const response = await fetch(`${API_BASE_URL}/resort?id=${resortId}`);
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch weather data: ${response.statusText}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
 
     const responseText = await response.text();
-    const apiResponse = JSON.parse(responseText) as ApiResponse;
+    console.log('Raw API Response:', responseText);
 
-    if (!apiResponse.currentWeather || !apiResponse.forecast) {
-      throw new Error('Invalid API response structure');
+
+    let apiResponse: ApiResponse;
+    try {
+      apiResponse = JSON.parse(responseText) as ApiResponse;
+    } catch (parseError) {
+      console.error('JSON Parsing Error:', parseError);
+      throw new Error('Failed to parse API response');
     }
+
+
+    // 验证必要的字段
+    if (!apiResponse.currentWeather || !apiResponse.forecast) {
+      console.error('Invalid API Response Structure:', apiResponse);
+      throw new Error('Invalid API response structure: weather data missing');
+    }
+
 
     return transformWeatherData(apiResponse);
   } catch (error) {
-    console.error('Error fetching weather data:', error);
+    console.error('Complete Error Details:', error);
     throw new Error(`Failed to get weather data: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+function transformWeatherData(apiResponse: ApiResponse): WeatherData {
+  return {
+    currentWeather: {
+      resort_id: apiResponse.resort.resort_id,
+      timestamp: apiResponse.currentWeather.timestamp,
+      temperature: apiResponse.currentWeather.temperature,
+      feels_like: apiResponse.currentWeather.feels_like,
+      pressure: apiResponse.currentWeather.pressure,
+      humidity: apiResponse.currentWeather.humidity,
+      weather_description: apiResponse.currentWeather.weather_description,
+      icon_id: apiResponse.currentWeather.uv_index.toString(), // 临时处理
+      uv_index: apiResponse.currentWeather.uv_index,
+      wind_gust: apiResponse.currentWeather.wind_gust,
+      cloudiness: apiResponse.currentWeather.cloudiness
+    },
+    forecast: apiResponse.forecast.map(day => ({
+      date: day.date,
+      temperature: {
+        max: day.temperature.max,
+        min: day.temperature.min,
+        feelsLikeDay: day.temperature.feelsLikeDay,
+        feelsLikeNight: day.temperature.feelsLikeNight
+      },
+      wind: {
+        speed: day.wind.speed,
+        direction: day.wind.direction,
+        gust: day.wind.gust
+      },
+      conditions: {
+        main: day.conditions.main,
+        description: day.conditions.description,
+        icon_id: day.uvIndex.toString(), // 临时处理
+        precipitationProbability: day.conditions.precipitationProbability,
+        snowAmount: day.conditions.snowAmount,
+        rainAmount: day.conditions.rainAmount
+      },
+      uv_index: day.uvIndex,
+      cloudiness: day.cloudiness
+    }))
+  };
 }
