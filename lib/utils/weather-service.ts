@@ -39,59 +39,65 @@ export interface WeatherData {
 }
 
 interface ApiResponse {
-  resort: {
-    resort_id: string;
-    name: string;
-    country_code: string;
-    region: string;
-    latitude: number;
-    longitude: number;
-    slopes_description: string;
-    total_slopes: number;
-    snow_parks: number;
-    night_skiing: number;
-    ski_lifts: number;
-    adult_day_pass: number;
-    currency: string;
-    season_start: string;
-    season_end: string;
-    image_url: string;
+  data: {
+    resort: {
+      resort_id: string;
+      name: string;
+      latitude: number;
+      longitude: number;
+      country_code?: string;
+      region?: string;
+      slopes_description?: string;
+      total_slopes?: number;
+      snow_parks?: number;
+      night_skiing?: number;
+      ski_lifts?: number;
+      adult_day_pass?: number;
+      currency?: string;
+      season_start?: string;
+      season_end?: string;
+      image_url?: string;
+    };
+    weather: {
+      current: {
+        timestamp: number;
+        temperature: number;
+        feels_like: number;
+        pressure: number;
+        humidity: number;
+        weather_description: string;
+        icon_id: string;
+        uv_index: number;
+        wind_gust: number;
+        cloudiness: number;
+      };
+      daily: Array<{
+        forecast_date: string;
+        temperature_max: number;
+        temperature_min: number;
+        feels_like_day: number;
+        feels_like_night: number;
+        precipitation_probability: number;
+        weather_main: string;
+        weather_description: string;
+        wind_speed: number;
+        wind_direction: number;
+        snow_amount: number;
+        rain_amount: number;
+        uv_index: number;
+        wind_gust: number;
+        cloudiness: number;
+        conditions: {
+          main: string;
+          description: string;
+          precipitationProbability: number;
+          snowAmount: number;
+          rainAmount: number;
+          icon_id: string;
+        };
+      }>;
+    };
   };
-  currentWeather: {
-    resort_id: string;
-    timestamp: number;
-    temperature: number;
-    feels_like: number;
-    pressure: number;
-    humidity: number;
-    weather_description: string;
-    uv_index: number;
-    wind_gust: number;
-    cloudiness: number;
-  };
-  forecast: Array<{
-    date: string;
-    temperature: {
-      max: number;
-      min: number;
-      feelsLikeDay: number;
-      feelsLikeNight: number;
-    };
-    wind: {
-      speed: number;
-      direction: number;
-      gust: number;
-    };
-    conditions: {
-      main: string;
-      description: string;
-      precipitationProbability: number;
-      snowAmount: number;
-      rainAmount: number;
-    };
-    uvIndex: number;
-    cloudiness: number;
-  }>;
 }
 
 
@@ -175,6 +181,7 @@ export async function getWeatherData(resortId: string): Promise<WeatherData> {
   }
 }
 
+
 function transformWeatherData(apiResponse: ApiResponse): WeatherData {
   return {
     currentWeather: {
@@ -185,7 +192,7 @@ function transformWeatherData(apiResponse: ApiResponse): WeatherData {
       pressure: apiResponse.currentWeather.pressure,
       humidity: apiResponse.currentWeather.humidity,
       weather_description: apiResponse.currentWeather.weather_description,
-      icon_id: apiResponse.currentWeather.uv_index.toString(), // 临时处理
+      icon_id: apiResponse.currentWeather.icon_id, // 直接使用 API 返回的 icon_id
       uv_index: apiResponse.currentWeather.uv_index,
       wind_gust: apiResponse.currentWeather.wind_gust,
       cloudiness: apiResponse.currentWeather.cloudiness
@@ -206,7 +213,7 @@ function transformWeatherData(apiResponse: ApiResponse): WeatherData {
       conditions: {
         main: day.conditions.main,
         description: day.conditions.description,
-        icon_id: day.uvIndex.toString(), // 临时处理
+        icon_id: day.conditions.icon_id, // 直接使用 API 返回的 icon_id
         precipitationProbability: day.conditions.precipitationProbability,
         snowAmount: day.conditions.snowAmount,
         rainAmount: day.conditions.rainAmount

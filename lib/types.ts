@@ -47,9 +47,9 @@ export interface SkiResort {
   slopes_description?: string;
 }
 
-// 当前天气接口
+
 export interface CurrentWeather {
-  resort_id: string;
+  resort_id?: string;
   timestamp: number;
   temperature: number;
   feels_like: number;
@@ -62,7 +62,6 @@ export interface CurrentWeather {
   cloudiness: number;
 }
 
-// 天气预报接口
 
 export interface Forecast {
   date: string;
@@ -77,6 +76,11 @@ export interface Forecast {
     direction: number;
     gust: number;
   };
+  precipitation_probability: number;
+  weather_main: string;
+  weather_description: string;
+  snow_amount: number;
+  rain_amount: number;
   conditions: {
     main: string;
     description: string;
@@ -85,7 +89,7 @@ export interface Forecast {
     snowAmount: number;
     rainAmount: number;
   };
-  uv_index: number; // 修改为 uv_index
+  uv_index: number;
   cloudiness: number;
 }
 
