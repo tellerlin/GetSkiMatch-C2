@@ -206,11 +206,13 @@ const Weather = memo(({ weather, isLoading, error }: WeatherProps) => {
                       label="Precipitation"
                       value={`${(day.conditions.precipitationProbability * 100).toFixed(0)}%`}
                     />
+
                     <WeatherMetric
                       icon={<Sun className="h-4 w-4" />}
                       label="UV Index"
-                      value={day.uvIndex.toString()}
+                      value={day.uv_index ? day.uv_index.toString() : 'N/A'} // 添加安全检查
                     />
+
                   </div>
 
                   {(day.conditions.snowAmount > 20 || day.wind.gust > 15) && (

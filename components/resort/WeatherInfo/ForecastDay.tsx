@@ -19,7 +19,7 @@ interface ForecastDayProps {
       precipitationProbability: number;
       snowAmount: number;
     };
-    uvIndex: number;
+    uv_index: number;
   };
 }
 
@@ -72,7 +72,7 @@ export default function ForecastDay({ day }: ForecastDayProps) {
 
         <div className="flex items-center justify-between">
           <Sun className="h-4 w-4" />
-          <span>UV Index: {day.uvIndex}</span>
+          <span>UV Index: {day.uv_index}</span>
         </div>
       </div>
 

@@ -33,7 +33,7 @@ export interface WeatherData {
       snowAmount: number;
       rainAmount: number;
     };
-    uvIndex: number;
+    uv_index: number;
     cloudiness: number;
   }>;
 }
@@ -79,7 +79,7 @@ interface ApiResponse {
       snowAmount: number;
       rainAmount: number;
     };
-    uvIndex: number;
+    uv_index: number;
     cloudiness: number;
   }>;
 }
@@ -131,11 +131,27 @@ function transformWeatherData(apiResponse: ApiResponse): WeatherData {
   return {
     currentWeather: apiResponse.currentWeather,
     forecast: apiResponse.forecast.map(day => ({
-      date: day.date,
-      temperature: day.temperature,
-      wind: day.wind,
-      conditions: day.conditions,
-      uvIndex: day.uvIndex,
+      date: day.forecast_date, // 修改为 forecast_date
+      temperature: {
+        max: day.temperature_max,
+        min: day.temperature_min,
+        feelsLikeDay: day.feels_like_day,
+        feelsLikeNight: day.feels_like_night
+      },
+      wind: {
+        speed: day.wind_speed,
+        direction: day.wind_direction,
+        gust: day.wind_gust
+      },
+      conditions: {
+        main: day.conditions.main,
+        description: day.conditions.description,
+        icon_id: day.conditions.icon_id, // 确保传递 icon_id
+        precipitationProbability: day.precipitation_probability / 100,
+        snowAmount: day.snow_amount,
+        rainAmount: day.rain_amount
+      },
+      uv_index: day.uv_index,
       cloudiness: day.cloudiness
     }))
   };

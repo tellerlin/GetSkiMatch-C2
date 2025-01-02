@@ -63,22 +63,20 @@ export interface CurrentWeather {
 }
 
 // 天气预报接口
+
 export interface Forecast {
   date: string;
-
   temperature: {
     max: number;
     min: number;
     feelsLikeDay: number;
     feelsLikeNight: number;
   };
-
   wind: {
     speed: number;
     direction: number;
     gust: number;
   };
-
   conditions: {
     main: string;
     description: string;
@@ -87,10 +85,10 @@ export interface Forecast {
     snowAmount: number;
     rainAmount: number;
   };
-
-  uvIndex: number;
+  uv_index: number; // 修改为 uv_index
   cloudiness: number;
 }
+
 
 export interface WeatherData {
   currentWeather: CurrentWeather;

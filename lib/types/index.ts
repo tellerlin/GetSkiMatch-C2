@@ -70,7 +70,7 @@ export interface WeatherData {
       snowAmount: number;
       rainAmount: number;
     };
-    uvIndex: number;
+    uv_index: number;
     cloudiness: number;
   }>;
 }
